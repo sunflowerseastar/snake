@@ -1,7 +1,5 @@
 import { Dispatch, useReducer } from "react";
 
-const BOARD_SIZE = 20;
-
 // types
 
 export enum Direction {
@@ -14,6 +12,7 @@ export enum Direction {
 type Coordinate = { x: number; y: number };
 
 interface State {
+  boardSize: number;
   direction: Direction;
   food: Coordinate;
   isGameOver: boolean;
@@ -30,8 +29,8 @@ type SnakeGameAction =
 
 // utilities
 
-const isInBounds = (coord: Coordinate): boolean =>
-  coord.x >= 0 && coord.y >= 0 && coord.x < BOARD_SIZE && coord.y < BOARD_SIZE;
+const isInBounds = (coord: Coordinate, boardSize: number): boolean =>
+  coord.x >= 0 && coord.y >= 0 && coord.x < boardSize && coord.y < boardSize;
 
 const isCoordInCoords = (coord: Coordinate, coords: Coordinate[]): boolean =>
   coords.some(({ x, y }) => x === coord.x && y === coord.y);
@@ -45,18 +44,47 @@ const opposite = (d: Direction) =>
     ? "ArrowRight"
     : "ArrowLeft";
 
+// random int from 0 to 19
+const randomInt = (boardSize: number) => Math.floor(Math.random() * boardSize);
+
+const randomCoord = (boardSize: number) => ({
+  x: randomInt(boardSize),
+  y: randomInt(boardSize),
+});
+
+const randomCoordThatAvoidsCoord = (
+  coordToAvoid: Coordinate,
+  boardSize: number
+): Coordinate => {
+  const possibleCoord = randomCoord(boardSize);
+  return possibleCoord.x === coordToAvoid.x &&
+    possibleCoord.y === coordToAvoid.y
+    ? randomCoordThatAvoidsCoord(coordToAvoid, boardSize)
+    : possibleCoord;
+};
+
+const randomCoordThatAvoidsCoords = (
+  coordsToAvoid: Coordinate[],
+  boardSize: number
+): Coordinate => {
+  const possibleCoord = randomCoord(boardSize);
+  return isCoordInCoords(possibleCoord, coordsToAvoid)
+    ? randomCoordThatAvoidsCoords(coordsToAvoid, boardSize)
+    : possibleCoord;
+};
+
 // TODO make snake starting coordinates two random adjacent x/y's
 const initialSnake: Coordinate[] = [
   { x: 10, y: 10 },
   { x: 10, y: 11 },
 ];
 
-// TODO make food random, and make sure it does not appear in the snake
-const initialFood: Coordinate = { x: 5, y: 5 };
+const initialBoardSize = 20;
 
 export const initialState: State = {
+  boardSize: initialBoardSize,
   direction: Direction.ArrowUp,
-  food: initialFood,
+  food: randomCoordThatAvoidsCoords(initialSnake, initialBoardSize),
   isGameOver: false,
   isPaused: false,
   lastDirectionMoved: undefined,
@@ -81,7 +109,7 @@ function stateReducer(state: State, action: SnakeGameAction): State {
           ? { x: head.x - 1, y: head.y }
           : { x: head.x + 1, y: head.y };
 
-      const isHittingWall = !isInBounds(newHead);
+      const isHittingWall = !isInBounds(newHead, state.boardSize);
       const isHittingSelf = isCoordInCoords(newHead, state.snake);
       const isGameOver = isHittingWall || isHittingSelf;
 
@@ -92,12 +120,8 @@ function stateReducer(state: State, action: SnakeGameAction): State {
         ? [newHead, ...state.snake]
         : [newHead, ...state.snake.slice(0, -1)];
 
-      // TODO make sure food does not appear in the snake
       const newFood = isEatingFood
-        ? {
-            x: Math.floor(Math.random() * BOARD_SIZE),
-            y: Math.floor(Math.random() * BOARD_SIZE),
-          }
+        ? randomCoordThatAvoidsCoords(newSnake, state.boardSize)
         : state.food;
 
       return {

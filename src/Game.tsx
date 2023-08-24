@@ -5,7 +5,7 @@ import { GameBoard, SnakeSquare, Food } from "./GameStyles";
 
 const Game: React.FC = () => {
   const [state, dispatch] = useGameReducer();
-  const { food, isGameOver, isPaused, snake } = state;
+  const { boardSize, food, isGameOver, isPaused, snake } = state;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -37,7 +37,7 @@ const Game: React.FC = () => {
   );
 
   return (
-    <GameBoard>
+    <GameBoard boardSize={boardSize}>
       {snake.map((snakeSquare, i) => (
         <SnakeSquare
           key={i}
