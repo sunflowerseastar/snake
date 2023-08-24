@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useGame } from '../hooks/useGame';
-import { GameBoard, SnakePart, Food } from '../styles/GameStyles';
+import { useGame } from './useGame';
+import { GameBoard, SnakePart, Food } from './GameStyles';
 
 const Game: React.FC = () => {
   const { snake, food, direction, isGameOver, startGame, changeDirection } = useGame();

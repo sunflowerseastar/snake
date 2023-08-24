@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Direction, Coordinate } from '../types';
+import { useState, useEffect, useCallback } from "react";
+
+type Direction = "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight";
+type Coordinate = { x: number; y: number };
 
 const initialSnake: Coordinate[] = [
   { x: 10, y: 10 },
@@ -9,7 +11,7 @@ const initialSnake: Coordinate[] = [
 
 const initialFood: Coordinate = { x: 5, y: 5 };
 
-const initialDirection: Direction = 'ArrowUp';
+const initialDirection: Direction = "ArrowUp";
 
 export const useGame = () => {
   const [snake, setSnake] = useState<Coordinate[]>(initialSnake);
@@ -35,21 +37,27 @@ export const useGame = () => {
     let newHead: Coordinate;
 
     switch (direction) {
-      case 'ArrowUp':
+      case "ArrowUp":
         newHead = { x: head.x, y: head.y - 1 };
         break;
-      case 'ArrowDown':
+      case "ArrowDown":
         newHead = { x: head.x, y: head.y + 1 };
         break;
-      case 'ArrowLeft':
+      case "ArrowLeft":
         newHead = { x: head.x - 1, y: head.y };
         break;
-      case 'ArrowRight':
+      case "ArrowRight":
         newHead = { x: head.x + 1, y: head.y };
         break;
     }
 
-    if (newHead.x < 0 || newHead.y < 0 || newHead.x >= 20 || newHead.y >= 20 || snake.some(coord => coord.x === newHead.x && coord.y === newHead.y)) {
+    if (
+      newHead.x < 0 ||
+      newHead.y < 0 ||
+      newHead.x >= 20 ||
+      newHead.y >= 20 ||
+      snake.some((coord) => coord.x === newHead.x && coord.y === newHead.y)
+    ) {
       endGame();
       return;
     }
@@ -57,7 +65,10 @@ export const useGame = () => {
     let newSnake = [...snake];
 
     if (newHead.x === food.x && newHead.y === food.y) {
-      setFood({ x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) });
+      setFood({
+        x: Math.floor(Math.random() * 20),
+        y: Math.floor(Math.random() * 20),
+      });
     } else {
       newSnake.pop();
     }
