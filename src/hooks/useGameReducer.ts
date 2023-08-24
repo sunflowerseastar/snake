@@ -52,17 +52,6 @@ const randomCoord = (boardSize: number) => ({
   y: randomInt(boardSize),
 });
 
-const randomCoordThatAvoidsCoord = (
-  coordToAvoid: Coordinate,
-  boardSize: number
-): Coordinate => {
-  const possibleCoord = randomCoord(boardSize);
-  return possibleCoord.x === coordToAvoid.x &&
-    possibleCoord.y === coordToAvoid.y
-    ? randomCoordThatAvoidsCoord(coordToAvoid, boardSize)
-    : possibleCoord;
-};
-
 const randomCoordThatAvoidsCoords = (
   coordsToAvoid: Coordinate[],
   boardSize: number
