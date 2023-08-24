@@ -62,13 +62,9 @@ const randomCoordThatAvoidsCoords = (
     : possibleCoord;
 };
 
-// TODO make snake starting coordinates two random adjacent x/y's
-const initialSnake: Coordinate[] = [
-  { x: 10, y: 10 },
-  { x: 10, y: 11 },
-];
-
 const initialBoardSize = 20;
+
+const initialSnake: Coordinate[] = [randomCoord(initialBoardSize)];
 
 export const initialState: State = {
   boardSize: initialBoardSize,
