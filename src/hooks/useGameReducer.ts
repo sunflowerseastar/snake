@@ -1,8 +1,8 @@
 import { Dispatch, useReducer } from "react";
 
-type Coordinate = { x: number; y: number };
+const BOARD_SIZE = 20;
 
-// TODO make '20' (board size) a constant
+// types
 
 export enum Direction {
   ArrowUp = "ArrowUp",
@@ -10,6 +10,8 @@ export enum Direction {
   ArrowLeft = "ArrowLeft",
   ArrowRight = "ArrowRight",
 }
+
+type Coordinate = { x: number; y: number };
 
 interface State {
   direction: Direction;
@@ -26,7 +28,24 @@ type SnakeGameAction =
   | { type: "pause" }
   | { type: "changeDirection"; value: State["direction"] };
 
-// TODO make snake start random
+// utilities
+
+const isInBounds = (coord: Coordinate): boolean =>
+  coord.x >= 0 && coord.y >= 0 && coord.x < BOARD_SIZE && coord.y < BOARD_SIZE;
+
+const isCoordInCoords = (coord: Coordinate, coords: Coordinate[]): boolean =>
+  coords.some(({ x, y }) => x === coord.x && y === coord.y);
+
+const opposite = (d: Direction) =>
+  d === "ArrowUp"
+    ? "ArrowDown"
+    : d === "ArrowDown"
+    ? "ArrowUp"
+    : d === "ArrowLeft"
+    ? "ArrowRight"
+    : "ArrowLeft";
+
+// TODO make snake starting coordinates two random adjacent x/y's
 const initialSnake: Coordinate[] = [
   { x: 10, y: 10 },
   { x: 10, y: 11 },
@@ -35,15 +54,12 @@ const initialSnake: Coordinate[] = [
 // TODO make food random, and make sure it does not appear in the snake
 const initialFood: Coordinate = { x: 5, y: 5 };
 
-const initialDirection: Direction = Direction.ArrowUp;
-const lastDirectionMoved: Direction = Direction.ArrowUp;
-
 export const initialState: State = {
-  direction: initialDirection,
+  direction: Direction.ArrowUp,
   food: initialFood,
   isGameOver: false,
   isPaused: false,
-  lastDirectionMoved: initialDirection,
+  lastDirectionMoved: undefined,
   snake: initialSnake,
 };
 
@@ -65,13 +81,9 @@ function stateReducer(state: State, action: SnakeGameAction): State {
           ? { x: head.x - 1, y: head.y }
           : { x: head.x + 1, y: head.y };
 
-      const isHittingWall =
-        newHead.x < 0 || newHead.y < 0 || newHead.x >= 20 || newHead.y >= 20;
-
-      const isHittingSelf = state.snake.some(
-        (coord) => coord.x === newHead.x && coord.y === newHead.y
-      );
-      const isGameNowOver = isHittingWall || isHittingSelf;
+      const isHittingWall = !isInBounds(newHead);
+      const isHittingSelf = isCoordInCoords(newHead, state.snake);
+      const isGameOver = isHittingWall || isHittingSelf;
 
       const isEatingFood =
         newHead.x === state.food.x && newHead.y === state.food.y;
@@ -83,28 +95,19 @@ function stateReducer(state: State, action: SnakeGameAction): State {
       // TODO make sure food does not appear in the snake
       const newFood = isEatingFood
         ? {
-            x: Math.floor(Math.random() * 20),
-            y: Math.floor(Math.random() * 20),
+            x: Math.floor(Math.random() * BOARD_SIZE),
+            y: Math.floor(Math.random() * BOARD_SIZE),
           }
         : state.food;
 
       return {
         ...state,
         food: newFood,
-        isGameOver: isGameNowOver,
+        isGameOver,
         lastDirectionMoved: state.direction,
-        snake: isGameNowOver ? state.snake : newSnake,
+        snake: isGameOver ? state.snake : newSnake,
       };
     case "changeDirection":
-      const opposite = (d: Direction) =>
-        d === "ArrowUp"
-          ? "ArrowDown"
-          : d === "ArrowDown"
-          ? "ArrowUp"
-          : d === "ArrowLeft"
-          ? "ArrowRight"
-          : "ArrowLeft";
-
       return action.value === state.direction ||
         (state.lastDirectionMoved &&
           action.value === opposite(state.lastDirectionMoved))
