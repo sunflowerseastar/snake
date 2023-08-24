@@ -17,7 +17,7 @@ export const GameBoard = styled.div`
   background-color: #000;
 `;
 
-export const SnakePart = styled(GridItem)`
+export const SnakeSquare = styled(GridItem)`
   background-color: #0f0;
 `;
 

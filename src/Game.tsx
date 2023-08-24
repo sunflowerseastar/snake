@@ -1,45 +1,55 @@
-import React, { useEffect } from 'react';
-import { useGame } from './useGame';
-import { GameBoard, SnakePart, Food } from './GameStyles';
+import React, { useEffect } from "react";
+import { Direction, useGameReducer } from "./hooks/useGameReducer";
+import useInterval from "./hooks/useInterval";
+import { GameBoard, SnakeSquare, Food } from "./GameStyles";
 
 const Game: React.FC = () => {
-  const { snake, food, direction, isGameOver, startGame, changeDirection } = useGame();
+  const [state, dispatch] = useGameReducer();
+
+  const { food, isGameOver, isPaused, snake } = state;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case 'ArrowUp':
-          if (direction !== 'ArrowDown') changeDirection('ArrowUp');
-          break;
-        case 'ArrowDown':
-          if (direction !== 'ArrowUp') changeDirection('ArrowDown');
-          break;
-        case 'ArrowLeft':
-          if (direction !== 'ArrowRight') changeDirection('ArrowLeft');
-          break;
-        case 'ArrowRight':
-          if (direction !== 'ArrowLeft') changeDirection('ArrowRight');
-          break;
+      if (Object.values(Direction).includes(event.key as Direction)) {
+        dispatch({ type: "changeDirection", value: event.key as Direction });
+      } else {
+        if (event.key === " ") {
+          dispatch({ type: "pause" });
+        }
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [direction, changeDirection]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [dispatch]);
 
-  useEffect(() => {
-    if (isGameOver) {
-      alert('Game Over!');
-      startGame();
-    }
-  }, [isGameOver, startGame]);
+  // useEffect(() => {
+  //   if (isGameOver) {
+  //     // alert('Game Over!');
+  //     console.log("game over");
+  //     // startGame();
+  //   }
+  // }, [isGameOver, startGame]);
+
+  useInterval(
+    () => {
+      dispatch({ type: "moveSnake" });
+    },
+    isPaused ? 100 : null
+  );
 
   return (
     <GameBoard>
-      {snake.map((part, index) => (
-        <SnakePart key={index} style={{ gridRowStart: part.y, gridColumnStart: part.x }} />
+      {snake.map((snakeSquare, i) => (
+        <SnakeSquare
+          key={i}
+          style={{
+            gridRowStart: snakeSquare.y + 1,
+            gridColumnStart: snakeSquare.x + 1,
+          }}
+        />
       ))}
-      <Food style={{ gridRowStart: food.y, gridColumnStart: food.x }} />
+      <Food style={{ gridRowStart: food.y + 1, gridColumnStart: food.x + 1 }} />
     </GameBoard>
   );
 };
