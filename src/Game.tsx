@@ -5,7 +5,6 @@ import { GameBoard, SnakeSquare, Food } from "./GameStyles";
 
 const Game: React.FC = () => {
   const [state, dispatch] = useGameReducer();
-
   const { food, isGameOver, isPaused, snake } = state;
 
   useEffect(() => {
@@ -23,13 +22,12 @@ const Game: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (isGameOver) {
-  //     // alert('Game Over!');
-  //     console.log("game over");
-  //     // startGame();
-  //   }
-  // }, [isGameOver, startGame]);
+  useEffect(() => {
+    if (isGameOver) {
+      alert("Game Over!");
+      dispatch({ type: "startGame" });
+    }
+  }, [isGameOver]);
 
   useInterval(
     () => {

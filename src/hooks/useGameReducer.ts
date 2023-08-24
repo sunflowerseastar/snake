@@ -16,6 +16,7 @@ interface State {
   food: Coordinate;
   isGameOver: boolean;
   isPaused: boolean;
+  lastDirectionMoved: Direction | undefined;
   snake: Coordinate[];
 }
 
@@ -35,12 +36,14 @@ const initialSnake: Coordinate[] = [
 const initialFood: Coordinate = { x: 5, y: 5 };
 
 const initialDirection: Direction = Direction.ArrowUp;
+const lastDirectionMoved: Direction = Direction.ArrowUp;
 
 export const initialState: State = {
   direction: initialDirection,
   food: initialFood,
   isGameOver: false,
   isPaused: false,
+  lastDirectionMoved: initialDirection,
   snake: initialSnake,
 };
 
@@ -89,6 +92,7 @@ function stateReducer(state: State, action: SnakeGameAction): State {
         ...state,
         food: newFood,
         isGameOver: isGameNowOver,
+        lastDirectionMoved: state.direction,
         snake: isGameNowOver ? state.snake : newSnake,
       };
     case "changeDirection":
@@ -102,7 +106,8 @@ function stateReducer(state: State, action: SnakeGameAction): State {
           : "ArrowLeft";
 
       return action.value === state.direction ||
-        action.value === opposite(state.direction)
+        (state.lastDirectionMoved &&
+          action.value === opposite(state.lastDirectionMoved))
         ? state
         : { ...state, direction: action.value };
     default:
