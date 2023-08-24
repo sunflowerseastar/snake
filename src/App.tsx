@@ -11,10 +11,9 @@ const App: React.FC = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (Object.values(Direction).includes(event.key as Direction)) {
         dispatch({ type: "changeDirection", value: event.key as Direction });
-      } else {
-        if (event.key === " ") {
-          dispatch({ type: "pause" });
-        }
+        dispatch({ type: "unpause" });
+      } else if (event.key === " ") {
+        dispatch({ type: "togglePause" });
       }
     };
 
@@ -33,8 +32,12 @@ const App: React.FC = () => {
     () => {
       dispatch({ type: "moveSnake" });
     },
-    isPaused ? 100 : null
+    !isPaused ? 100 : null
   );
+
+  // TODO style cleanup (put in middle of viewport, soften colors)
+
+  // TODO add some sort of scoring
 
   return (
     <GameBoard boardSize={boardSize}>

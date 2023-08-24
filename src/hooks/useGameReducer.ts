@@ -24,7 +24,8 @@ interface State {
 type SnakeGameAction =
   | { type: "startGame" }
   | { type: "moveSnake" }
-  | { type: "pause" }
+  | { type: "togglePause" }
+  | { type: "unpause" }
   | { type: "changeDirection"; value: State["direction"] };
 
 // utilities
@@ -71,7 +72,7 @@ export const initialState: State = {
   direction: Direction.ArrowUp,
   food: randomCoordThatAvoidsCoords(initialSnake, initialBoardSize),
   isGameOver: false,
-  isPaused: false,
+  isPaused: true,
   lastDirectionMoved: undefined,
   snake: initialSnake,
 };
@@ -80,8 +81,10 @@ function stateReducer(state: State, action: SnakeGameAction): State {
   switch (action.type) {
     case "startGame":
       return initialState;
-    case "pause":
+    case "togglePause":
       return { ...state, isPaused: !state.isPaused };
+    case "unpause":
+      return { ...state, isPaused: false };
     case "moveSnake":
       const head = state.snake[0];
 
