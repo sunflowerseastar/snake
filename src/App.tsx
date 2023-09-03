@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Direction, useGameReducer } from "./hooks/useGameReducer";
 import { useInterval } from "./hooks/useInterval";
 import { GameBoard, SnakeSquare, Food } from "./style";
