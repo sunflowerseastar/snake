@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { Direction, useGameReducer } from "./hooks/useGameReducer";
 import { useInterval } from "./hooks/useInterval";
-import { GameBoard, SnakeSquare, Food } from "./style";
+import Board from "./components/Board";
+import BoardContainer from "./components/BoardContainer";
+import Square from "./components/Square";
 
-const App: React.FC = () => {
+const App = () => {
   const [state, dispatch] = useGameReducer();
   const { boardSize, food, isGameOver, isPaused, snake } = state;
 
@@ -35,23 +37,23 @@ const App: React.FC = () => {
     !isPaused ? 100 : null
   );
 
-  // TODO style cleanup (put in middle of viewport, soften colors)
-
   // TODO add some sort of scoring
 
   return (
-    <GameBoard boardSize={boardSize}>
-      {snake.map((snakeSquare, i) => (
-        <SnakeSquare
-          key={i}
-          style={{
-            gridRowStart: snakeSquare.y + 1,
-            gridColumnStart: snakeSquare.x + 1,
-          }}
-        />
-      ))}
-      <Food style={{ gridRowStart: food.y + 1, gridColumnStart: food.x + 1 }} />
-    </GameBoard>
+    <BoardContainer>
+      <Board boardSize={boardSize}>
+        <>
+          {snake.map((snakeSquare) => (
+            <Square
+              key={`${snakeSquare.x}-${snakeSquare.y}`}
+              x={snakeSquare.x}
+              y={snakeSquare.y}
+            />
+          ))}
+          <Square x={food.x} y={food.y} isFood />
+        </>
+      </Board>
+    </BoardContainer>
   );
 };
 
