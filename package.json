@@ -4,10 +4,11 @@
   "description": "snake in react",
   "scripts": {
     "build": "tsc && vite build",
+    "build-storybook": "storybook build",
     "dev": "vite",
     "serve": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "test": "vitest"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -33,7 +34,8 @@
     "eslint-plugin-storybook": "^0.6.13",
     "storybook": "^7.4.0",
     "typescript": "^5.2.2",
-    "vite": "^4.4.9"
+    "vite": "^4.4.9",
+    "vitest": "^0.34.3"
   },
   "eslintConfig": {
     "extends": [
