@@ -3,7 +3,10 @@ import { Direction, useGameReducer } from "./hooks/useGameReducer";
 import { useInterval } from "./hooks/useInterval";
 import Board from "./components/Board";
 import BoardContainer from "./components/BoardContainer";
+import Score from "./components/Score";
 import Square from "./components/Square";
+import { Len9CharsComponent } from "./components/Len9";
+import { scoreRow, statusRow } from "./app.css";
 
 const App = () => {
   const [state, dispatch] = useGameReducer();
@@ -37,22 +40,29 @@ const App = () => {
     !isPaused ? 100 : null
   );
 
-  // TODO add some sort of scoring
-
   return (
     <BoardContainer>
-      <Board boardSize={boardSize}>
-        <>
-          {snake.map((snakeSquare) => (
-            <Square
-              key={`${snakeSquare.x}-${snakeSquare.y}`}
-              x={snakeSquare.x}
-              y={snakeSquare.y}
-            />
-          ))}
-          <Square x={food.x} y={food.y} isFood />
-        </>
-      </Board>
+      <div>
+        <div className={scoreRow}>
+          <Score score={snake.length} />
+        </div>
+        <Board boardSize={boardSize}>
+          <>
+            {snake.map(({ x, y }) => (
+              <Square key={`${x}-${y}`} x={x} y={y} />
+            ))}
+            <Square x={food.x} y={food.y} isFood />
+          </>
+        </Board>
+        <div className={statusRow}>
+          <Len9CharsComponent
+            len9Chars={
+              isGameOver ? "arrow keys start" : isPaused ? "isPaused" : ""
+            }
+            gridWidth={60}
+          />
+        </div>
+      </div>
     </BoardContainer>
   );
 };
