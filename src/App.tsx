@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Direction, useGameReducer } from "./hooks/useGameReducer";
 import { useInterval } from "./hooks/useInterval";
 import Board from "./components/Board";
-import BoardContainer from "./components/BoardContainer";
+import GameAreaContainer from "./components/GameAreaContainer";
 import Score from "./components/Score";
 import Square from "./components/Square";
 import { Len9CharsComponent } from "./components/Len9";
@@ -41,7 +41,7 @@ const App = () => {
   );
 
   return (
-    <BoardContainer>
+    <GameAreaContainer>
       <div>
         <div className={scoreRow}>
           <Score score={snake.length} />
@@ -63,7 +63,7 @@ const App = () => {
           />
         </div>
       </div>
-    </BoardContainer>
+    </GameAreaContainer>
   );
 };
 
