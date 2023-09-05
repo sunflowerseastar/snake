@@ -1,9 +1,9 @@
-import { LettersComponent } from "./Len9";
+import { Len9CharsComponent } from "./Len9";
 
 const Score = ({ score }: { score: number }) => (
   <div>
-    <LettersComponent
-      letters={score.toString()}
+    <Len9CharsComponent
+      len9Chars={score.toString()}
       gridWidth={60}
       isRightAligned
     />

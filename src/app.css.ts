@@ -21,7 +21,7 @@ export const statusRow = style({
   paddingTop: "1em",
 });
 
-export const lettersGrid = style({
+export const len9CharsGrid = style({
   display: "grid",
   gridTemplateColumns: "repeat(13, 1fr)",
   gridAutoRows: "1fr",
@@ -36,7 +36,7 @@ export const lettersGrid = style({
 });
 const blockBase = style({
   selectors: {
-    [`${lettersGrid} > &:first-child`]: {
+    [`${len9CharsGrid} > &:first-child`]: {
       gridRow: "1 / 1",
       gridColumn: "1 / 1",
     },

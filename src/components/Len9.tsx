@@ -1,11 +1,8 @@
-import { lettersGrid, block0, block1 } from "../app.css";
-// console.log('letters', letters);
+import { len9CharsGrid, block0, block1 } from "../app.css";
 
-type BinaryLetter = number[];
+type BinaryLen9Char = number[];
 
-// TODO rename 'letters' to 'characters'
-
-const binaryLetters: Record<string, BinaryLetter> = {
+const binaryLen9Chars: Record<string, BinaryLen9Char> = {
   a: [0, 1, 0, 1, 1, 1, 1, 0, 1],
   b: [1, 0, 0, 1, 1, 1, 1, 1, 1],
   c: [1, 1, 1, 1, 0, 0, 1, 1, 1],
@@ -45,25 +42,25 @@ const binaryLetters: Record<string, BinaryLetter> = {
   "0": [1, 1, 1, 1, 0, 1, 1, 1, 1],
 };
 
-export const lookupLetter = (l: string): BinaryLetter => {
-  return l === " " ? [0, 0, 0] : binaryLetters[l.toLowerCase()] || [];
+export const lookupLen9Char = (l: string): BinaryLen9Char => {
+  return l === " " ? [0, 0, 0] : binaryLen9Chars[l.toLowerCase()] || [];
 };
 
-export const strToBinaryLetters = (str: string): BinaryLetter[] => {
-  const acc: BinaryLetter[] = [];
-  const letters = Array.from(str);
+export const strToBinaryLen9Chars = (str: string): BinaryLen9Char[] => {
+  const acc: BinaryLen9Char[] = [];
+  const len9Chars = Array.from(str);
 
-  for (let i = 0; i < letters.length; i++) {
-    const l = letters[i];
-    const nextLetter = letters[i + 1];
-    const isNextLetterS = nextLetter === "s" || nextLetter === "S";
-    const binaryL = lookupLetter(l);
-    const canLigature = isNextLetterS && binaryL[5] === 0 && binaryL[8] === 0;
+  for (let i = 0; i < len9Chars.length; i++) {
+    const l = len9Chars[i];
+    const nextLen9Char = len9Chars[i + 1];
+    const isNextLen9CharS = nextLen9Char === "s" || nextLen9Char === "S";
+    const binaryL = lookupLen9Char(l);
+    const canLigature = isNextLen9CharS && binaryL[5] === 0 && binaryL[8] === 0;
 
-    if (canLigature || i + 1 >= letters.length) {
+    if (canLigature || i + 1 >= len9Chars.length) {
       acc.push(binaryL);
     } else {
-      acc.push(binaryL, lookupLetter(" "));
+      acc.push(binaryL, lookupLen9Char(" "));
     }
   }
 
@@ -81,10 +78,10 @@ export const strToBinaryLetters = (str: string): BinaryLetter[] => {
  *  [111 0 111 0 100]
  *  [101 0 111 0 111]]
  *
- * Note that spaces are placed before all letters except 's' in strToBinaryLetters()."
+ * Note that spaces are placed before all len9Chars except 's' in strToBinaryLen9Chars()."
  */
 export const len9 = (str: string): number[][] =>
-  strToBinaryLetters(str).reduce(
+  strToBinaryLen9Chars(str).reduce(
     ([topRow, middleRow, bottomRow], l) => {
       const len = l.length;
       const third = len / 3;
@@ -97,41 +94,41 @@ export const len9 = (str: string): number[][] =>
     [[], [], []]
   );
 
-type LettersComponentProps = {
-  letters: string;
-  gridWidth: number;
-  isRightAligned: boolean;
+type Len9CharsComponentProps = {
+  len9Chars: string;
+  gridWidth?: number;
+  isRightAligned?: boolean;
 };
 
-export const LettersComponent: React.FC<LettersComponentProps> = ({
-  letters,
+export const Len9CharsComponent: React.FC<Len9CharsComponentProps> = ({
+  len9Chars,
   gridWidth = 0,
   isRightAligned = false,
 }) => {
-  const lettersAsThreeRows = len9(letters);
+  const len9CharsAsThreeRows = len9(len9Chars);
 
   // TODO extract this as helper (fill with zeros) and add test
-  const lettersAsThreeRowsPadded =
+  const len9CharsAsThreeRowsPadded =
     gridWidth === 0
-      ? lettersAsThreeRows
-      : lettersAsThreeRows.map((letterRow) => {
-          const delta = gridWidth - lettersAsThreeRows[0].length;
+      ? len9CharsAsThreeRows
+      : len9CharsAsThreeRows.map((len9CharRow) => {
+          const delta = gridWidth - len9CharsAsThreeRows[0].length;
           const fillZeros = Array.from({ length: delta }, () => 0);
           return isRightAligned
-            ? [...fillZeros, ...letterRow]
-            : [...letterRow, ...fillZeros];
+            ? [...fillZeros, ...len9CharRow]
+            : [...len9CharRow, ...fillZeros];
         });
 
   return (
     <div
-      className={lettersGrid}
+      className={len9CharsGrid}
       style={{
         gridTemplateColumns: `repeat(${
-          gridWidth > 0 ? gridWidth : lettersAsThreeRowsPadded[0].length
+          gridWidth > 0 ? gridWidth : len9CharsAsThreeRowsPadded[0].length
         }, 1fr)`,
       }}
     >
-      {lettersAsThreeRowsPadded.flat().map((x, i) => (
+      {len9CharsAsThreeRowsPadded.flat().map((x, i) => (
         <div key={i} className={x === 1 ? block1 : block0}></div>
       ))}
     </div>
