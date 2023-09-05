@@ -5,7 +5,7 @@ interface BoardProps {
   children: React.ReactElement;
 }
 
-const Board: React.FC<BoardProps> = ({ boardSize, children}) => (
+const Board: React.FC<BoardProps> = ({ boardSize, children }) => (
   <div
     className={board}
     style={{

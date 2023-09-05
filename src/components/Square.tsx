@@ -1,4 +1,4 @@
-import { snake, food } from '../app.css'
+import { snake, food } from "../app.css";
 
 const Square = ({
   x,
@@ -10,8 +10,8 @@ const Square = ({
   isFood?: boolean;
 }) => (
   <div
-  key={`${x}-${y}`}
-  className={isFood ? food : snake}
+    key={`${x}-${y}`}
+    className={isFood ? food : snake}
     style={{
       gridRowStart: y + 1,
       gridColumnStart: x + 1,

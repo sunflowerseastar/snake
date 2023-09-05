@@ -1,5 +1,10 @@
 import { expect, test } from "vitest";
-import {Direction, isInBounds, isCoordInCoords, opposite } from "./useGameReducer";
+import {
+  Direction,
+  isCoordInCoords,
+  isInBounds,
+  opposite,
+} from "./useGameReducer";
 
 test("square xy coordinate is in/not-in the board boundary", () => {
   expect(isInBounds({ x: 0, y: 0 }, 20)).toEqual(true);

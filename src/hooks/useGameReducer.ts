@@ -33,8 +33,10 @@ type SnakeGameAction =
 export const isInBounds = (coord: Coordinate, boardSize: number): boolean =>
   coord.x >= 0 && coord.y >= 0 && coord.x < boardSize && coord.y < boardSize;
 
-export const isCoordInCoords = (coord: Coordinate, coords: Coordinate[]): boolean =>
-  coords.some(({ x, y }) => x === coord.x && y === coord.y);
+export const isCoordInCoords = (
+  coord: Coordinate,
+  coords: Coordinate[]
+): boolean => coords.some(({ x, y }) => x === coord.x && y === coord.y);
 
 export const opposite = (d: Direction) =>
   d === "ArrowUp"
