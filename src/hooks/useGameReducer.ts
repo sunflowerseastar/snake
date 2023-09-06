@@ -9,6 +9,13 @@ export enum Direction {
   ArrowRight = "ArrowRight",
 }
 
+export enum GamePlayState {
+  ready = "ready",
+  over = "over",
+  unpaused = "unpaused",
+  paused = "paused",
+}
+
 type Coordinate = { x: number; y: number };
 
 interface State {
@@ -16,17 +23,17 @@ interface State {
   direction: Direction;
   food: Coordinate;
   isGameOver: boolean;
-  isPaused: boolean;
+  gamePlayState: GamePlayState;
   lastDirectionMoved: Direction | undefined;
   snake: Coordinate[];
 }
 
 type SnakeGameAction =
   | { type: "startGame" }
+  | { type: "endGame" }
   | { type: "moveSnake" }
-  | { type: "togglePause" }
-  | { type: "unpause" }
-  | { type: "changeDirection"; value: State["direction"] };
+  | { type: "pressSpace" }
+  | { type: "pressArrowKey"; value: State["direction"] };
 
 // utilities
 
@@ -67,26 +74,29 @@ const randomCoordThatAvoidsCoords = (
 
 const initialBoardSize = 20;
 
-const initialSnake: Coordinate[] = [randomCoord(initialBoardSize)];
+const getInitialState = () => {
+  const initialSnake: Coordinate[] = [randomCoord(initialBoardSize)];
 
-export const initialState: State = {
-  boardSize: initialBoardSize,
-  direction: Direction.ArrowUp,
-  food: randomCoordThatAvoidsCoords(initialSnake, initialBoardSize),
-  isGameOver: false,
-  isPaused: true,
-  lastDirectionMoved: undefined,
-  snake: initialSnake,
+  return {
+    boardSize: initialBoardSize,
+    direction: Direction.ArrowUp,
+    food: randomCoordThatAvoidsCoords(initialSnake, initialBoardSize),
+    isGameOver: false,
+    gamePlayState: GamePlayState.ready,
+    lastDirectionMoved: undefined,
+    snake: initialSnake,
+  };
 };
 
 function stateReducer(state: State, action: SnakeGameAction): State {
   switch (action.type) {
     case "startGame":
-      return initialState;
-    case "togglePause":
-      return { ...state, isPaused: !state.isPaused };
-    case "unpause":
-      return { ...state, isPaused: false };
+      return getInitialState();
+    case "endGame":
+      return {
+        ...state,
+        gamePlayState: GamePlayState.over,
+      };
     case "moveSnake":
       const head = state.snake[0];
 
@@ -121,16 +131,38 @@ function stateReducer(state: State, action: SnakeGameAction): State {
         lastDirectionMoved: state.direction,
         snake: isGameOver ? state.snake : newSnake,
       };
-    case "changeDirection":
-      return action.value === state.direction ||
-        (state.lastDirectionMoved &&
-          action.value === opposite(state.lastDirectionMoved))
+    case "pressSpace":
+      return state.gamePlayState === GamePlayState.over
+        ? { ...getInitialState(), gamePlayState: GamePlayState.ready }
+        : state.gamePlayState === GamePlayState.ready
+        ? { ...state, gamePlayState: GamePlayState.unpaused }
+        : state.gamePlayState === GamePlayState.unpaused
+        ? { ...state, gamePlayState: GamePlayState.paused }
+        : { ...state, gamePlayState: GamePlayState.unpaused };
+    case "pressArrowKey":
+      return state.gamePlayState === GamePlayState.over
         ? state
-        : { ...state, direction: action.value };
+        : state.gamePlayState === GamePlayState.ready
+        ? {
+            ...state,
+            direction: action.value,
+            gamePlayState: GamePlayState.unpaused,
+          }
+        : state.snake.length > 1 &&
+          state.lastDirectionMoved &&
+          action.value === opposite(state.lastDirectionMoved)
+        ? state
+        : action.value === state.direction
+        ? { ...state, gamePlayState: GamePlayState.unpaused }
+        : {
+            ...state,
+            direction: action.value,
+            gamePlayState: GamePlayState.unpaused,
+          };
     default:
       throw new Error("Unknown action");
   }
 }
 
 export const useGameReducer = (): [State, Dispatch<SnakeGameAction>] =>
-  useReducer(stateReducer, initialState);
+  useReducer(stateReducer, getInitialState());

@@ -1,5 +1,9 @@
 import { useEffect } from "react";
-import { Direction, useGameReducer } from "./hooks/useGameReducer";
+import {
+  Direction,
+  GamePlayState,
+  useGameReducer,
+} from "./hooks/useGameReducer";
 import { useInterval } from "./hooks/useInterval";
 import Board from "./components/Board";
 import GameAreaContainer from "./components/GameAreaContainer";
@@ -10,15 +14,14 @@ import { scoreRow, statusRow } from "./app.css";
 
 const App = () => {
   const [state, dispatch] = useGameReducer();
-  const { boardSize, food, isGameOver, isPaused, snake } = state;
+  const { boardSize, food, gamePlayState, isGameOver, snake } = state;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (Object.values(Direction).includes(event.key as Direction)) {
-        dispatch({ type: "changeDirection", value: event.key as Direction });
-        dispatch({ type: "unpause" });
+        dispatch({ type: "pressArrowKey", value: event.key as Direction });
       } else if (event.key === " ") {
-        dispatch({ type: "togglePause" });
+        dispatch({ type: "pressSpace" });
       }
     };
 
@@ -28,8 +31,7 @@ const App = () => {
 
   useEffect(() => {
     if (isGameOver) {
-      alert("Game Over!");
-      dispatch({ type: "startGame" });
+      dispatch({ type: "endGame" });
     }
   }, [isGameOver]);
 
@@ -37,7 +39,7 @@ const App = () => {
     () => {
       dispatch({ type: "moveSnake" });
     },
-    !isPaused ? 100 : null
+    gamePlayState === GamePlayState.unpaused ? 100 : null
   );
 
   return (
@@ -57,7 +59,13 @@ const App = () => {
         <div className={statusRow}>
           <Len9CharsComponent
             len9Chars={
-              isGameOver ? "arrow keys start" : isPaused ? "isPaused" : ""
+              gamePlayState === GamePlayState.ready
+                ? "ready"
+                : gamePlayState === GamePlayState.over
+                ? "game over"
+                : gamePlayState === GamePlayState.paused
+                ? "paused"
+                : ""
             }
             gridWidth={60}
           />
