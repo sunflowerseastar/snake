@@ -14,7 +14,7 @@ import { scoreRow, statusRow } from "./app.css";
 
 const App = () => {
   const [state, dispatch] = useGameReducer();
-  const { boardSize, food, gamePlayState, isGameOver, snake } = state;
+  const { boardSize, food, gamePlayState, isGameOver, snake, tickSpeedMs } = state;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -39,7 +39,7 @@ const App = () => {
     () => {
       dispatch({ type: "moveSnake" });
     },
-    gamePlayState === GamePlayState.unpaused ? 100 : null
+    gamePlayState === GamePlayState.unpaused ? tickSpeedMs : null
   );
 
   return (

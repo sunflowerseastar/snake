@@ -22,10 +22,11 @@ interface State {
   boardSize: number;
   direction: Direction;
   food: Coordinate;
-  isGameOver: boolean;
   gamePlayState: GamePlayState;
+  isGameOver: boolean;
   lastDirectionMoved: Direction | undefined;
   snake: Coordinate[];
+  tickSpeedMs: number;
 }
 
 type SnakeGameAction =
@@ -81,10 +82,11 @@ const getInitialState = () => {
     boardSize: initialBoardSize,
     direction: Direction.ArrowUp,
     food: randomCoordThatAvoidsCoords(initialSnake, initialBoardSize),
-    isGameOver: false,
     gamePlayState: GamePlayState.ready,
+    isGameOver: false,
     lastDirectionMoved: undefined,
     snake: initialSnake,
+    tickSpeedMs: 80
   };
 };
 
