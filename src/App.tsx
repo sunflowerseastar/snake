@@ -58,7 +58,7 @@ const App = () => {
         </Board>
         <div className={statusRow}>
           <Len9CharsComponent
-            len9Chars={
+            text={
               gamePlayState === GamePlayState.ready
                 ? "ready"
                 : gamePlayState === GamePlayState.over
