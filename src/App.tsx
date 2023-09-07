@@ -9,7 +9,7 @@ import Board from "./components/Board";
 import GameAreaContainer from "./components/GameAreaContainer";
 import Score from "./components/Score";
 import Square from "./components/Square";
-import { Len9CharsComponent } from "./components/Len9";
+import { Len9Marquee } from "./components/Len9";
 import { scoreRow, statusRow } from "./app.css";
 
 const App = () => {
@@ -57,15 +57,15 @@ const App = () => {
           </>
         </Board>
         <div className={statusRow}>
-          <Len9CharsComponent
-            text={
+          <Len9Marquee
+            textArr={
               gamePlayState === GamePlayState.ready
-                ? "ready"
+                ? ["ready", "press key"]
                 : gamePlayState === GamePlayState.over
-                ? "game over"
+                ? ["game over", "press key"]
                 : gamePlayState === GamePlayState.paused
-                ? "paused"
-                : ""
+                ? ["paused", "x"]
+                : ["z", "z2"]
             }
             gridWidth={60}
           />

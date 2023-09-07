@@ -1,4 +1,36 @@
+import { useEffect, useRef, useState } from "react";
 import { len9CharsGrid, block0, block1 } from "../app.css";
+import { useTimeout } from "../hooks/useTimeout";
+import {
+  Transducer,
+  cat,
+  comp,
+  concat,
+  distinct,
+  filter,
+  flatten,
+  flatten1,
+  flattenWith,
+  indexed,
+  interleave,
+  iterator,
+  map,
+  mapIndexed,
+  padLast,
+  padSides,
+  partition,
+  peek,
+  pluck,
+  push,
+  range,
+  repeat,
+  slidingWindow,
+  step,
+  take,
+  trace,
+  transduce,
+  zip,
+} from "@thi.ng/transducers";
 
 type BinaryLen9Char = number[];
 
@@ -111,20 +143,19 @@ export const padWithZeros = (
   gridWidth === 0
     ? len9
     : len9.map((len9CharRow) => {
-        const delta = gridWidth - len9[0].length;
-        const fillZeros = Array.from({ length: delta }, () => 0);
+        const delta = gridWidth - len9CharRow.length;
         return isRightAligned
-          ? [...fillZeros, ...len9CharRow]
-          : [...len9CharRow, ...fillZeros];
+          ? [...concat(repeat(0, delta), len9CharRow)]
+          : [...concat(len9CharRow, repeat(0, delta))];
       });
 
-type Len9CharsComponentProps = {
+type Len9TextProps = {
   text: string;
   gridWidth?: number;
   isRightAligned?: boolean;
 };
 
-export const Len9CharsComponent: React.FC<Len9CharsComponentProps> = ({
+export const Len9Text: React.FC<Len9TextProps> = ({
   text,
   gridWidth = 0,
   isRightAligned = false,
@@ -147,6 +178,123 @@ export const Len9CharsComponent: React.FC<Len9CharsComponentProps> = ({
       }}
     >
       {len9CharsAsThreeRowsPadded.flat().map((x, i) => (
+        <div key={i} className={x === 1 ? block1 : block0}></div>
+      ))}
+    </div>
+  );
+};
+
+const concatArrayPairs = map(([a, b]: [number[], number[]]) => [
+  ...concat(a, b),
+]);
+
+const sliceSubArrays = (currScrollPosition: number, gridWidth: number) =>
+  map((arr: number[]) =>
+    arr.slice(currScrollPosition, currScrollPosition + gridWidth)
+  );
+
+export const combineAndSliceSubArrays = (
+  len9a: number[][],
+  len9b: number[][],
+  currScrollPosition: number,
+  gridWidth: number
+) =>
+  transduce(
+    comp(concatArrayPairs, sliceSubArrays(currScrollPosition, gridWidth)),
+    push(),
+    zip(len9a, len9b)
+  );
+
+type Len9MarqueeProps = {
+  textArr: string[];
+  gridWidth?: number;
+  isRightAligned?: boolean;
+};
+
+export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
+  textArr,
+  gridWidth = 0,
+  isRightAligned = false,
+}) => {
+  const [currScrollPosition, setCurrScrollPosition] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [isText1First, setIsText1First] = useState(false);
+  const [text1, text2] = textArr;
+
+  console.log("isScrolling", isScrolling);
+
+  /* This ref is used as the interval's internal scroll counter, because
+   * otherwise the useEffect itself would be re-run over and over every time
+   * that currScrollPosition was bumped. */
+  const scrollPositionRef = useRef(0);
+
+
+  // TODO if there is no text in the array, don't do anything
+
+  // TODO if there is only one text in the array, don't marquee it
+
+  // TODO add an overall position reset every time the text array changes
+
+  useEffect(() => {
+    if (isScrolling) {
+      let scrollInterval = setInterval(() => {
+        if (scrollPositionRef.current < gridWidth) {
+          scrollPositionRef.current = scrollPositionRef.current + 1;
+          setCurrScrollPosition(scrollPositionRef.current);
+        } else {
+          // stop scrolling and clean up interval
+          setIsScrolling(false);
+          clearInterval(scrollInterval);
+
+          // reset scroll positions and swap texts
+          setIsText1First((prevIsText1First) => !prevIsText1First);
+          scrollPositionRef.current = 0;
+          setCurrScrollPosition(0);
+
+          setTimeout(() => {
+            // restart animation
+            setIsScrolling(true);
+          }, 2000);
+        }
+      }, 50);
+    }
+  }, [isScrolling]);
+
+  useTimeout(() => {
+    console.log("timeout!");
+    setIsScrolling(true);
+    // start the number count down to scroll the text
+  }, 1000);
+
+  const firstMessage: number[][] = padWithZeros(
+    len9(isText1First ? text1 : text2),
+    gridWidth,
+    isRightAligned
+  );
+  const secondMessage: number[][] = padWithZeros(
+    len9(isText1First ? text2 : text1),
+    gridWidth,
+    isRightAligned
+  );
+
+  const len9Chars = combineAndSliceSubArrays(
+    firstMessage,
+    secondMessage,
+    currScrollPosition,
+    gridWidth
+  );
+  // console.log('len9Chars', len9Chars);
+
+  return (
+    <div
+      className={len9CharsGrid}
+      style={{
+        gridTemplateColumns: `repeat(${
+          gridWidth > 0 ? gridWidth : firstMessage[0].length
+        }, 1fr)`,
+      }}
+    >
+      {len9Chars.flat().map((x, i) => (
         <div key={i} className={x === 1 ? block1 : block0}></div>
       ))}
     </div>

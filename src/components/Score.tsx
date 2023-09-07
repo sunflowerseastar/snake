@@ -1,8 +1,8 @@
-import { Len9CharsComponent } from "./Len9";
+import { Len9Text } from "./Len9";
 
 const Score = ({ score }: { score: number }) => (
   <div>
-    <Len9CharsComponent
+    <Len9Text
       text={score.toString()}
       gridWidth={60}
       isRightAligned
