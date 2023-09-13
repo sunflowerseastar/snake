@@ -14,8 +14,15 @@ import { scoreRow, statusRow } from "./app.css";
 
 const App = () => {
   const [state, dispatch] = useGameReducer();
-  const { boardSize, food, gamePlayState, isGameOver, snake, tickSpeedMs } =
-    state;
+  const {
+    boardSize,
+    food,
+    gamePlayState,
+    highScore,
+    isGameOver,
+    snake,
+    tickSpeedMs,
+  } = state;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -47,7 +54,7 @@ const App = () => {
     <GameAreaContainer>
       <div>
         <div className={scoreRow}>
-          <Score score={snake.length} />
+          <Score highScore={highScore} score={snake.length} />
         </div>
         <Board boardSize={boardSize}>
           <>

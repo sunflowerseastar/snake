@@ -27,6 +27,7 @@ interface State {
   lastDirectionMoved: Direction | undefined;
   snake: Coordinate[];
   tickSpeedMs: number;
+  highScore: number;
 }
 
 type SnakeGameAction =
@@ -77,6 +78,9 @@ const initialBoardSize = 20;
 
 const getInitialState = () => {
   const initialSnake: Coordinate[] = [randomCoord(initialBoardSize)];
+  const highScore = localStorage.getItem("highScore")
+    ? parseInt(localStorage.getItem("highScore")!)
+    : 0;
 
   return {
     boardSize: initialBoardSize,
@@ -86,7 +90,8 @@ const getInitialState = () => {
     isGameOver: false,
     lastDirectionMoved: undefined,
     snake: initialSnake,
-    tickSpeedMs: 80
+    tickSpeedMs: 80,
+    highScore: highScore,
   };
 };
 
@@ -95,9 +100,12 @@ function stateReducer(state: State, action: SnakeGameAction): State {
     case "startGame":
       return getInitialState();
     case "endGame":
+      const highScore = Math.max(state.snake.length, state.highScore);
+      localStorage.setItem("highScore", highScore.toString());
       return {
         ...state,
         gamePlayState: GamePlayState.over,
+        highScore: highScore,
       };
     case "moveSnake":
       const head = state.snake[0];
@@ -135,7 +143,11 @@ function stateReducer(state: State, action: SnakeGameAction): State {
       };
     case "pressSpace":
       return state.gamePlayState === GamePlayState.over
-        ? { ...getInitialState(), gamePlayState: GamePlayState.ready }
+        ? {
+            ...getInitialState(),
+            gamePlayState: GamePlayState.ready,
+            highScore: state.highScore,
+          }
         : state.gamePlayState === GamePlayState.ready
         ? { ...state, gamePlayState: GamePlayState.unpaused }
         : state.gamePlayState === GamePlayState.unpaused
