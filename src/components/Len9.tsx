@@ -2,35 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { len9CharsGrid, block0, block1 } from "../app.css";
 import { useTimeout } from "../hooks/useTimeout";
 import {
-  Transducer,
-  cat,
   comp,
   concat,
-  distinct,
-  filter,
-  flatten,
-  flatten1,
-  flattenWith,
-  indexed,
-  interleave,
-  iterator,
   map,
-  mapIndexed,
-  padLast,
-  padSides,
-  partition,
-  peek,
-  pluck,
   push,
-  range,
   repeat,
-  slidingWindow,
-  step,
-  take,
-  trace,
   transduce,
   zip,
 } from "@thi.ng/transducers";
+
+const SCROLL_DELAY_MS = 3000;
+const SCROLL_SPEED_MS = 60;
 
 type BinaryLen9Char = number[];
 
@@ -72,6 +54,11 @@ const binaryLen9Chars: Record<string, BinaryLen9Char> = {
   "8": [0, 1, 1, 1, 1, 1, 1, 1, 1],
   "9": [1, 1, 1, 1, 1, 1, 0, 0, 1],
   "0": [1, 1, 1, 1, 0, 1, 1, 1, 1],
+  "^": [0, 1, 0, 1, 1, 1, 0, 0, 0],
+  _: [0, 0, 0, 1, 1, 1, 0, 1, 0],
+  "<": [0, 1, 0, 1, 1, 0, 0, 1, 0],
+  ">": [0, 1, 0, 0, 1, 1, 0, 1, 0],
+  ".": [0, 0, 0, 0, 0, 0, 0, 1, 0],
 };
 
 export const lookupLen9Char = (char: string): BinaryLen9Char =>
@@ -218,25 +205,17 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
 }) => {
   const [currScrollPosition, setCurrScrollPosition] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
-  const [isText1First, setIsText1First] = useState(false);
+  const [isText1First, setIsText1First] = useState(true);
   const [text1, text2] = textArr;
-
-  console.log("isScrolling", isScrolling);
+  const isUsingMarqueeEffect = !!text2;
 
   /* This ref is used as the interval's internal scroll counter, because
    * otherwise the useEffect itself would be re-run over and over every time
    * that currScrollPosition was bumped. */
   const scrollPositionRef = useRef(0);
 
-
-  // TODO if there is no text in the array, don't do anything
-
-  // TODO if there is only one text in the array, don't marquee it
-
-  // TODO add an overall position reset every time the text array changes
-
   useEffect(() => {
-    if (isScrolling) {
+    if (isUsingMarqueeEffect && isScrolling && textArr.length > 0) {
       let scrollInterval = setInterval(() => {
         if (scrollPositionRef.current < gridWidth) {
           scrollPositionRef.current = scrollPositionRef.current + 1;
@@ -254,35 +233,38 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
           setTimeout(() => {
             // restart animation
             setIsScrolling(true);
-          }, 2000);
+          }, SCROLL_DELAY_MS);
         }
-      }, 50);
+      }, SCROLL_SPEED_MS);
     }
   }, [isScrolling]);
 
   useTimeout(() => {
-    console.log("timeout!");
-    setIsScrolling(true);
     // start the number count down to scroll the text
-  }, 1000);
+    isUsingMarqueeEffect && setIsScrolling(true);
+  }, SCROLL_DELAY_MS);
 
   const firstMessage: number[][] = padWithZeros(
     len9(isText1First ? text1 : text2),
     gridWidth,
     isRightAligned
   );
-  const secondMessage: number[][] = padWithZeros(
-    len9(isText1First ? text2 : text1),
-    gridWidth,
-    isRightAligned
-  );
+  const secondMessage: number[][] = isUsingMarqueeEffect
+    ? padWithZeros(
+        len9(isText1First ? text2 : text1),
+        gridWidth,
+        isRightAligned
+      )
+    : [[]];
 
-  const len9Chars = combineAndSliceSubArrays(
-    firstMessage,
-    secondMessage,
-    currScrollPosition,
-    gridWidth
-  );
+  const len9Chars = isUsingMarqueeEffect
+    ? combineAndSliceSubArrays(
+        firstMessage,
+        secondMessage,
+        currScrollPosition,
+        gridWidth
+      )
+    : firstMessage;
   // console.log('len9Chars', len9Chars);
 
   return (

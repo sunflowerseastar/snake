@@ -14,7 +14,8 @@ import { scoreRow, statusRow } from "./app.css";
 
 const App = () => {
   const [state, dispatch] = useGameReducer();
-  const { boardSize, food, gamePlayState, isGameOver, snake, tickSpeedMs } = state;
+  const { boardSize, food, gamePlayState, isGameOver, snake, tickSpeedMs } =
+    state;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -58,14 +59,15 @@ const App = () => {
         </Board>
         <div className={statusRow}>
           <Len9Marquee
+            key={gamePlayState}
             textArr={
               gamePlayState === GamePlayState.ready
-                ? ["ready", "press key"]
+                ? ["ready", "spc ^ _ < >"]
                 : gamePlayState === GamePlayState.over
-                ? ["game over", "press key"]
+                ? ["game over", "spc reset"]
                 : gamePlayState === GamePlayState.paused
-                ? ["paused", "x"]
-                : ["z", "z2"]
+                ? ["paused"]
+                : [""]
             }
             gridWidth={60}
           />
