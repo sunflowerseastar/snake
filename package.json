@@ -9,8 +9,7 @@
     "prettier:check": "prettier --check '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "prettier:write": "prettier --write '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "serve": "vite preview",
-    "storybook": "storybook dev -p 6006",
-    "test": "vitest"
+    "storybook": "storybook dev -p 6006"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"

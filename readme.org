@@ -1,0 +1,10 @@
+* snake
+
+This is a web version of the classic snake game, built with React.
+
+#+begin_src sh
+bun i
+bun dev # vite, localhost:5173
+bun build
+bun test --watch
+#+end_src
