@@ -13,7 +13,11 @@ body {
   justify-content: space-around;
 }
 .score-row {
+  display: flex;
   padding-bottom: 1em;
+}
+.score-row > div {
+  flex: 1;
 }
 .status-row {
   padding-top: 1em;
