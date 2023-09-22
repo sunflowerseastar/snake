@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "build-storybook": "storybook build",
-    "dev": "vite",
+    "dev": "bunx vite",
     "prettier:check": "prettier --check '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "prettier:write": "prettier --write '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "serve": "vite preview",
@@ -40,6 +40,7 @@
     "@vanilla-extract/css": "^1.13.0",
     "@vanilla-extract/vite-plugin": "^3.9.0",
     "@vitejs/plugin-react": "^4.0.4",
+    "bun-types": "^1.0.2",
     "eslint": "^8.5.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-storybook": "^0.6.13",
