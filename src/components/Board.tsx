@@ -1,20 +1,12 @@
-import {
-  bgBoard,
-  bgSquareDark,
-  bgSquareLight,
-  board,
-  boardContainer,
-} from "../app.css";
-
 interface BoardProps {
   boardSize: number;
   children: React.ReactElement;
 }
 
 const Board: React.FC<BoardProps> = ({ boardSize, children }) => (
-  <div className={boardContainer}>
+  <div className="board-container">
     <div
-      className={bgBoard}
+      className="bg-board"
       style={{
         gridTemplateColumns: `repeat(${boardSize}, 1fr)`,
         gridTemplateRows: `repeat(${boardSize}, 1fr)`,
@@ -28,15 +20,15 @@ const Board: React.FC<BoardProps> = ({ boardSize, children }) => (
             key={i}
             className={
               (isEvenRow && isEvenColumn) || (!isEvenRow && !isEvenColumn)
-                ? bgSquareDark
-                : bgSquareLight
+                ? "bg-square-dark"
+                : "bg-square-light"
             }
           />
         );
       })}
     </div>
     <div
-      className={board}
+      className="board"
       style={{
         gridTemplateColumns: `repeat(${boardSize}, 1fr)`,
         gridTemplateRows: `repeat(${boardSize}, 1fr)`,

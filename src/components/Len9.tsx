@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { len9CharsGrid, block0, block1 } from "../app.css";
 import { useTimeout } from "../hooks/useTimeout";
 import {
   comp,
@@ -157,7 +156,7 @@ export const Len9Text: React.FC<Len9TextProps> = ({
 
   return (
     <div
-      className={len9CharsGrid}
+      className="len-9-chars-grid"
       style={{
         gridTemplateColumns: `repeat(${
           gridWidth > 0 ? gridWidth : len9CharsAsThreeRowsPadded[0].length
@@ -165,7 +164,10 @@ export const Len9Text: React.FC<Len9TextProps> = ({
       }}
     >
       {len9CharsAsThreeRowsPadded.flat().map((x, i) => (
-        <div key={i} className={x === 1 ? block1 : block0}></div>
+        <div
+          key={i}
+          className={x === 1 ? "block block1" : "block block0"}
+        ></div>
       ))}
     </div>
   );
@@ -269,7 +271,7 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
 
   return (
     <div
-      className={len9CharsGrid}
+      className="len-9-chars-grid"
       style={{
         gridTemplateColumns: `repeat(${
           gridWidth > 0 ? gridWidth : firstMessage[0].length
@@ -277,7 +279,10 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
       }}
     >
       {len9Chars.flat().map((x, i) => (
-        <div key={i} className={x === 1 ? block1 : block0}></div>
+        <div
+          key={i}
+          className={x === 1 ? "block block1" : "block block0"}
+        ></div>
       ))}
     </div>
   );

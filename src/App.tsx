@@ -10,7 +10,6 @@ import GameAreaContainer from "./components/GameAreaContainer";
 import Score from "./components/Score";
 import Square from "./components/Square";
 import { Len9Marquee } from "./components/Len9";
-import { scoreRow, statusRow } from "./app.css";
 
 const App = () => {
   const [state, dispatch] = useGameReducer();
@@ -53,7 +52,7 @@ const App = () => {
   return (
     <GameAreaContainer>
       <div>
-        <div className={scoreRow}>
+        <div className="score-row">
           <Score highScore={highScore} score={snake.length} />
         </div>
         <Board boardSize={boardSize}>
@@ -64,7 +63,7 @@ const App = () => {
             <Square x={food.x} y={food.y} isFood />
           </>
         </Board>
-        <div className={statusRow}>
+        <div className="status-row">
           <Len9Marquee
             key={gamePlayState}
             textArr={

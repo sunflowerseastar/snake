@@ -1,0 +1,78 @@
+body {
+  margin: 0;
+}
+
+.game-area-container {
+  height: 100vh;
+  display: flex;
+  justify-content: space-around;
+}
+.game-area-container-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.score-row {
+  padding-bottom: 1em;
+}
+.status-row {
+  padding-top: 1em;
+}
+.len-9-chars-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  grid-auto-rows: 1fr;
+}
+.len-9-chars-grid::before {
+  content: "";
+  width: 0;
+  padding-bottom: 100%;
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
+}
+.len-9-chars-grid .block1:first-child,
+.len-9-chars-grid .block0:first-child {
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
+}
+.block1 {
+  background: #000;
+}
+.block0 {
+  background: none;
+}
+
+.snake {
+  background: #222;
+  z-index: 1;
+}
+.food {
+  background: #ff2b2b;
+  z-index: 1;
+}
+.board {
+  display: grid;
+  gap: 1px;
+  width: min(70vh, 70vw);
+  height: min(70vh, 70vw);
+}
+.board-container {
+  position: relative;
+}
+.bg-board {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+}
+.bg-square-dark {
+  background: repeating-linear-gradient(
+    -45deg,
+    #f1f1f1,
+    #f1f1f1 2px,
+    #fff 2px,
+    #fff 4px
+  );
+}
