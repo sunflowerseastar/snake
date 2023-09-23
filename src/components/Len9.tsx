@@ -3,6 +3,7 @@ import { useTimeout } from "../hooks/useTimeout";
 import {
   comp,
   concat,
+  iterator,
   map,
   push,
   repeat,
@@ -13,9 +14,7 @@ import {
 const SCROLL_DELAY_MS = 3000;
 const SCROLL_SPEED_MS = 60;
 
-type BinaryLen9Char = number[];
-
-const binaryLen9Chars: Record<string, BinaryLen9Char> = {
+const binaryLen9Chars: Record<string, number[]> = {
   a: [0, 1, 0, 1, 1, 1, 1, 0, 1],
   b: [1, 0, 0, 1, 1, 1, 1, 1, 1],
   c: [1, 1, 1, 1, 0, 0, 1, 1, 1],
@@ -55,12 +54,14 @@ const binaryLen9Chars: Record<string, BinaryLen9Char> = {
   "0": [1, 1, 1, 1, 0, 1, 1, 1, 1],
   "^": [0, 1, 0, 1, 1, 1, 0, 0, 0],
   _: [0, 0, 0, 1, 1, 1, 0, 1, 0],
-  "<": [0, 1, 0, 1, 1, 0, 0, 1, 0],
-  ">": [0, 1, 0, 0, 1, 1, 0, 1, 0],
+  ":": [0, 1, 0, 0, 0, 0, 0, 1, 0],
+  "<": [0, 1, 1, 1, 0, 1],
+  ">": [1, 0, 1, 1, 1, 0],
   ".": [0, 0, 0, 0, 0, 0, 0, 1, 0],
+  "/": [0, 0, 1, 0, 1, 0, 1, 0, 0],
 };
 
-export const lookupLen9Char = (char: string): BinaryLen9Char =>
+export const lookupLen9Char = (char: string): number[] =>
   char === " " ? [0, 0, 0] : binaryLen9Chars[char.toLowerCase()] || [];
 
 /*
@@ -69,10 +70,10 @@ export const lookupLen9Char = (char: string): BinaryLen9Char =>
  * that won't touch the 's' even if the space isn't there.
  *
  * 'abc': [[010111101] [000] [100111111] [000] [111100111]]
- * 'as': [[010111101] [000] [011010110]
- * 'ts': [[111010010] [011010110]
+ * 'as':  [[010111101] [000] [011010110]
+ * 'ts':  [[111010010] [011010110]
  */
-export const strToBinaryLen9Chars = (str: string): BinaryLen9Char[] => {
+export const strToBinaryLen9Chars = (str: string): number[][] => {
   const charArr = Array.from(str);
 
   return charArr.flatMap((c, i) => {
@@ -121,19 +122,48 @@ export const len9 = (str: string) =>
     [[], [], []] as number[][]
   );
 
-export const padWithZeros = (
-  len9: BinaryLen9Char[],
+const padWithZeros =
+  (gridWidth: number, isRightAligned: boolean = false) =>
+  (len9: number[][]) =>
+    len9.map((len9CharRow: number[]) =>
+      isRightAligned
+        ? [...concat(repeat(0, gridWidth - len9CharRow.length), len9CharRow)]
+        : [...concat(len9CharRow, repeat(0, gridWidth - len9CharRow.length))]
+    );
+
+export const convertToLen9AndAddPadding = (
+  marqueeMessages: string[],
+  gridWidth: number = 0,
+  isRightAligned: boolean = false
+): number[][][] =>
+  transduce(
+    comp(map(len9), map(padWithZeros(gridWidth, isRightAligned))),
+    push(),
+    marqueeMessages
+  );
+
+type Len9DisplayComponentProps = {
+  len9: number[][];
+  gridWidth?: number;
+};
+
+const Len9DisplayComponent: React.FC<Len9DisplayComponentProps> = ({
+  len9,
   gridWidth = 0,
-  isRightAligned = false
-) =>
-  gridWidth === 0
-    ? len9
-    : len9.map((len9CharRow) => {
-        const delta = gridWidth - len9CharRow.length;
-        return isRightAligned
-          ? [...concat(repeat(0, delta), len9CharRow)]
-          : [...concat(len9CharRow, repeat(0, delta))];
-      });
+}) => (
+  <div
+    className="len-9-chars-grid"
+    style={{
+      gridTemplateColumns: `repeat(${
+        gridWidth > 0 ? gridWidth : len9.length / 3
+      }, 1fr)`,
+    }}
+  >
+    {len9.flat().map((x, i) => (
+      <div key={i} className={x === 1 ? "block block1" : "block block0"}></div>
+    ))}
+  </div>
+);
 
 type Len9TextProps = {
   text: string;
@@ -146,70 +176,96 @@ export const Len9Text: React.FC<Len9TextProps> = ({
   gridWidth = 0,
   isRightAligned = false,
 }) => {
-  const len9CharsAsThreeRows = len9(text);
-
-  const len9CharsAsThreeRowsPadded = padWithZeros(
-    len9CharsAsThreeRows,
+  /*
+   * 'text' is array-ified (`[text]`) and then subsequently flattened so that the
+   * convertToLen9AndAddPadding() utility function can be shared with Len9Marquee's
+   * `marqueeMessages`.
+   */
+  const len9CharsReadyForDisplay: number[][] = convertToLen9AndAddPadding(
+    [text],
     gridWidth,
     isRightAligned
-  );
+  ).flat();
 
   return (
-    <div
-      className="len-9-chars-grid"
-      style={{
-        gridTemplateColumns: `repeat(${
-          gridWidth > 0 ? gridWidth : len9CharsAsThreeRowsPadded[0].length
-        }, 1fr)`,
-      }}
-    >
-      {len9CharsAsThreeRowsPadded.flat().map((x, i) => (
-        <div
-          key={i}
-          className={x === 1 ? "block block1" : "block block0"}
-        ></div>
-      ))}
-    </div>
+    <Len9DisplayComponent
+      len9={len9CharsReadyForDisplay}
+      gridWidth={gridWidth}
+    />
   );
 };
 
-const concatArrayPairs = map(([a, b]: [number[], number[]]) => [
-  ...concat(a, b),
-]);
+// Utility functions for Len9Marquee
 
-const sliceSubArrays = (currScrollPosition: number, gridWidth: number) =>
-  map((arr: number[]) =>
-    arr.slice(currScrollPosition, currScrollPosition + gridWidth)
-  );
-
-export const combineAndSliceSubArrays = (
+/*
+ * in (with 'A' and 'B' instead of `1` for illustration):
+ *
+ * [[- A - -]
+ *  [A A A -]
+ *  [A - A -]]
+ *
+ * [[B - - -]
+ *  [B B B -]
+ *  [B B B -]]
+ *
+ * ...:
+ *
+ * [[[- A - -] [B - - -]]
+ *  [[A A A -] [B B B -]]
+ *  [[A - A -] [B B B -]]]
+ *
+ * out:
+ *
+ * [[- A - - B - - -]
+ *  [A A A - B B B -]
+ *  [A - A - B B B -]]
+ */
+export const combineArrays = (
   len9a: number[][],
-  len9b: number[][],
-  currScrollPosition: number,
-  gridWidth: number
-) =>
+  len9b: number[][]
+): Iterable<number[]> =>
   transduce(
-    comp(concatArrayPairs, sliceSubArrays(currScrollPosition, gridWidth)),
+    map((arrs: [number[], number[]]) => [...concat(...arrs)]),
     push(),
     zip(len9a, len9b)
   );
 
+/*
+ * in (with 'A' and 'B' instead of `1` for illustration):
+ *
+ * [[- A - - B - - -]
+ *  [A A A - B B B -]
+ *  [A - A - B B B -]]
+ *     ^-----^ (currScrollPosition 1, gridWidth 3)
+ *
+ * ...:
+ *
+ * [[A - - B]
+ *  [A A - B]
+ *  [- A - B]]
+ *
+ * out:
+ *
+ * [[A - - B A A - B - A - B]]
+ */
+const sliceSubArraysAndCat = (currScrollPosition: number, gridWidth: number) =>
+  map((arr: number[]) =>
+    arr.slice(currScrollPosition, currScrollPosition + gridWidth)
+  );
+
 type Len9MarqueeProps = {
-  textArr: string[];
+  marqueeMessages: string[];
   gridWidth?: number;
-  isRightAligned?: boolean;
 };
 
 export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
-  textArr,
-  gridWidth = 0,
-  isRightAligned = false,
+  marqueeMessages,
+  gridWidth = 60,
 }) => {
   const [currScrollPosition, setCurrScrollPosition] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
-  const [isText1First, setIsText1First] = useState(true);
-  const [text1, text2] = textArr;
-  const isUsingMarqueeEffect = !!text2;
+  const [activeTextIndex, setActiveTextIndex] = useState(0);
+  const isUsingMarqueeEffect = marqueeMessages.length > 1;
 
   /* This ref is used as the interval's internal scroll counter, because
    * otherwise the useEffect itself would be re-run over and over every time
@@ -217,7 +273,7 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
   const scrollPositionRef = useRef(0);
 
   useEffect(() => {
-    if (isUsingMarqueeEffect && isScrolling && textArr.length > 0) {
+    if (isUsingMarqueeEffect && isScrolling && marqueeMessages.length > 0) {
       let scrollInterval = setInterval(() => {
         if (scrollPositionRef.current < gridWidth) {
           scrollPositionRef.current = scrollPositionRef.current + 1;
@@ -227,8 +283,22 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
           setIsScrolling(false);
           clearInterval(scrollInterval);
 
-          // reset scroll positions and swap texts
-          setIsText1First((prevIsText1First) => !prevIsText1First);
+          /*
+           * bump 'active text index'.
+           *
+           * Ex. start at 0, it'll scroll from marqueeMessages[0] to marqueeMessages[1]:
+           *
+           * ['ready', 'set', 'start']
+           *  ---0--->>--1--
+           *
+           * ...then active text index bumps to 1, so it scrolls the next two:
+           *
+           * ['ready', 'set', 'start']
+           *           --1-->>---2---
+           */
+          setActiveTextIndex((prevActiveTextIndex) => prevActiveTextIndex + 1);
+
+          // reset scroll positions
           scrollPositionRef.current = 0;
           setCurrScrollPosition(0);
 
@@ -242,48 +312,37 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
   }, [isScrolling]);
 
   useTimeout(() => {
-    // start the number count down to scroll the text
+    // this only happens once, to kick off the first scrolling after a delay
     isUsingMarqueeEffect && setIsScrolling(true);
   }, SCROLL_DELAY_MS);
 
-  const firstMessage: number[][] = padWithZeros(
-    len9(isText1First ? text1 : text2),
-    gridWidth,
-    isRightAligned
+  const len9sPadded: number[][][] = convertToLen9AndAddPadding(
+    marqueeMessages,
+    gridWidth
   );
-  const secondMessage: number[][] = isUsingMarqueeEffect
-    ? padWithZeros(
-        len9(isText1First ? text2 : text1),
-        gridWidth,
-        isRightAligned
-      )
-    : [[]];
 
-  const len9Chars = isUsingMarqueeEffect
-    ? combineAndSliceSubArrays(
-        firstMessage,
-        secondMessage,
-        currScrollPosition,
-        gridWidth
-      )
-    : firstMessage;
-  // console.log('len9Chars', len9Chars);
+  /*
+   * The activeTextIndex is used to choose which 2 elements from the
+   * marqueeMessages' array to combine (see comment in useEffect, above).
+   * CombineArrays() essentially zips and concats the two messages top/middle/bottom
+   * sub-arrays. See diagram in the comment at the combineArrays function.
+   */
+  const len9CharsCombined = combineArrays(
+    len9sPadded[activeTextIndex % marqueeMessages.length],
+    len9sPadded[(activeTextIndex + 1) % marqueeMessages.length]
+  );
+
+  const len9SlicedCharsReadyForDisplay = [
+    ...iterator(
+      sliceSubArraysAndCat(currScrollPosition, gridWidth),
+      len9CharsCombined
+    ),
+  ];
 
   return (
-    <div
-      className="len-9-chars-grid"
-      style={{
-        gridTemplateColumns: `repeat(${
-          gridWidth > 0 ? gridWidth : firstMessage[0].length
-        }, 1fr)`,
-      }}
-    >
-      {len9Chars.flat().map((x, i) => (
-        <div
-          key={i}
-          className={x === 1 ? "block block1" : "block block0"}
-        ></div>
-      ))}
-    </div>
+    <Len9DisplayComponent
+      len9={len9SlicedCharsReadyForDisplay}
+      gridWidth={gridWidth}
+    />
   );
 };

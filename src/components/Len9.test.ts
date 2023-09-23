@@ -1,10 +1,9 @@
 import { expect, test } from "bun:test";
-
 import {
-  combineAndSliceSubArrays,
+  combineArrays,
+  convertToLen9AndAddPadding,
   len9,
   lookupLen9Char,
-  padWithZeros,
   strToBinaryLen9Chars,
 } from "./Len9";
 
@@ -16,6 +15,11 @@ const len9a = [
 const len9b = [
   [5, 6, 0],
   [7, 8, 0],
+];
+
+const len9c = [
+  [9, 9, 0],
+  [9, 8, 0],
 ];
 
 test("len-9", () => {
@@ -49,27 +53,29 @@ test("len-9", () => {
     [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0],
     [1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1],
   ]);
-  expect(padWithZeros(len9("a"))).toEqual([
-    [0, 1, 0],
-    [1, 1, 1],
-    [1, 0, 1],
+  expect(convertToLen9AndAddPadding(["a"], 3)).toEqual([
+    [
+      [0, 1, 0],
+      [1, 1, 1],
+      [1, 0, 1],
+    ],
   ]);
-  expect(padWithZeros(len9("a"), 5)).toEqual([
-    [0, 1, 0, 0, 0],
-    [1, 1, 1, 0, 0],
-    [1, 0, 1, 0, 0],
+  expect(convertToLen9AndAddPadding(["a"], 5)).toEqual([
+    [
+      [0, 1, 0, 0, 0],
+      [1, 1, 1, 0, 0],
+      [1, 0, 1, 0, 0],
+    ],
   ]);
-  expect(padWithZeros(len9("a"), 5, true)).toEqual([
-    [0, 0, 0, 1, 0],
-    [0, 0, 1, 1, 1],
-    [0, 0, 1, 0, 1],
+  expect(convertToLen9AndAddPadding(["a"], 5, true)).toEqual([
+    [
+      [0, 0, 0, 1, 0],
+      [0, 0, 1, 1, 1],
+      [0, 0, 1, 0, 1],
+    ],
   ]);
-  expect(combineAndSliceSubArrays(len9a, len9b, 0, 2)).toEqual([
-    [1, 2],
-    [3, 4],
-  ]);
-  expect(combineAndSliceSubArrays(len9a, len9b, 1, 3)).toEqual([
-    [2, 0, 5],
-    [4, 0, 7],
+  expect(combineArrays(len9a, len9b)).toEqual([
+    [1, 2, 0, 5, 6, 0],
+    [3, 4, 0, 7, 8, 0],
   ]);
 });

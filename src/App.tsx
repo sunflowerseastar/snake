@@ -66,16 +66,15 @@ const App = () => {
         <div className="status-row">
           <Len9Marquee
             key={gamePlayState}
-            textArr={
+            marqueeMessages={
               gamePlayState === GamePlayState.ready
-                ? ["ready", "spc ^ _ < >"]
+                ? ["ready", "move: ^ _ < >", "spc: pause"]
                 : gamePlayState === GamePlayState.over
-                ? ["game over", "spc reset"]
+                ? ["game over", "spc: reset"]
                 : gamePlayState === GamePlayState.paused
-                ? ["paused"]
+                ? ["paused", "spc: unpause"]
                 : [""]
             }
-            gridWidth={60}
           />
         </div>
       </div>
