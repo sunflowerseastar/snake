@@ -9,7 +9,8 @@
     "prettier:check": "prettier --check '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "prettier:write": "prettier --write '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "serve": "vite preview",
-    "storybook": "storybook dev -p 6006"
+    "storybook": "storybook dev -p 6006",
+    "test": "vitest"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
@@ -37,7 +38,6 @@
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/parser": "^5.8.1",
     "@vitejs/plugin-react": "^4.0.4",
-    "bun-types": "^1.0.2",
     "eslint": "^8.5.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-storybook": "^0.6.13",
