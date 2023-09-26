@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTimeout } from "../hooks/useTimeout";
 import {
   comp,
@@ -316,20 +316,25 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
     isUsingMarqueeEffect && setIsScrolling(true);
   }, SCROLL_DELAY_MS);
 
-  const len9sPadded: number[][][] = convertToLen9AndAddPadding(
-    marqueeMessages,
-    gridWidth
+  const len9sPadded = useMemo(
+    () => convertToLen9AndAddPadding(marqueeMessages, gridWidth),
+    [marqueeMessages, gridWidth]
   );
 
   /*
    * The activeTextIndex is used to choose which 2 elements from the
    * marqueeMessages' array to combine (see comment in useEffect, above).
-   * CombineArrays() essentially zips and concats the two messages top/middle/bottom
-   * sub-arrays. See diagram in the comment at the combineArrays function.
+   * combineArrays() essentially zips and concats the two messages'
+   * top/middle/bottom sub-arrays. See diagram in the comment at the
+   * combineArrays function.
    */
-  const len9CharsCombined = combineArrays(
-    len9sPadded[activeTextIndex % marqueeMessages.length],
-    len9sPadded[(activeTextIndex + 1) % marqueeMessages.length]
+  const len9CharsCombined = useMemo(
+    () =>
+      combineArrays(
+        len9sPadded[activeTextIndex % marqueeMessages.length],
+        len9sPadded[(activeTextIndex + 1) % marqueeMessages.length]
+      ),
+    [len9sPadded, activeTextIndex, marqueeMessages]
   );
 
   const len9SlicedCharsReadyForDisplay = [
