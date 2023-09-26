@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import classNames from "classnames";
 import { useTimeout } from "../hooks/useTimeout";
 import {
   comp,
@@ -28,7 +29,7 @@ const binaryLen9Chars: Record<string, number[]> = {
   k: [1, 0, 1, 1, 1, 0, 1, 0, 1],
   l: [1, 0, 0, 1, 0, 0, 1, 1, 1],
   m: [1, 1, 1, 1, 1, 1, 1, 0, 1],
-  n: [0, 0, 1, 1, 1, 1, 1, 0, 0],
+  n: [1, 1, 1, 1, 0, 1, 1, 0, 1],
   o: [1, 1, 1, 1, 0, 1, 1, 1, 1],
   p: [1, 1, 1, 1, 1, 1, 1, 0, 0],
   q: [1, 1, 0, 1, 1, 0, 0, 0, 1],
@@ -59,6 +60,9 @@ const binaryLen9Chars: Record<string, number[]> = {
   ">": [1, 0, 1, 1, 1, 0],
   ".": [0, 0, 0, 0, 0, 0, 0, 1, 0],
   "/": [0, 0, 1, 0, 1, 0, 1, 0, 0],
+  "[": [1, 1, 1, 0, 1, 1],
+  "]": [1, 1, 0, 1, 1, 1],
+  ",": [0, 0, 0, 1, 1, 0],
 };
 
 export const lookupLen9Char = (char: string): number[] =>
@@ -143,16 +147,18 @@ export const convertToLen9AndAddPadding = (
   );
 
 type Len9DisplayComponentProps = {
-  len9: number[][];
+  cx?: object;
   gridWidth?: number;
+  len9: number[][];
 };
 
 const Len9DisplayComponent: React.FC<Len9DisplayComponentProps> = ({
-  len9,
+  cx = {},
   gridWidth = 0,
+  len9,
 }) => (
   <div
-    className="len-9-chars-grid"
+    className={classNames({ ...cx, "len-9-chars-grid": true })}
     style={{
       gridTemplateColumns: `repeat(${
         gridWidth > 0 ? gridWidth : len9.length / 3
@@ -166,15 +172,17 @@ const Len9DisplayComponent: React.FC<Len9DisplayComponentProps> = ({
 );
 
 type Len9TextProps = {
-  text: string;
+  cx?: object;
   gridWidth?: number;
   isRightAligned?: boolean;
+  text: string;
 };
 
 export const Len9Text: React.FC<Len9TextProps> = ({
-  text,
+  cx = {},
   gridWidth = 0,
   isRightAligned = false,
+  text,
 }) => {
   /*
    * 'text' is array-ified (`[text]`) and then subsequently flattened so that the
@@ -189,8 +197,9 @@ export const Len9Text: React.FC<Len9TextProps> = ({
 
   return (
     <Len9DisplayComponent
-      len9={len9CharsReadyForDisplay}
       gridWidth={gridWidth}
+      cx={cx}
+      len9={len9CharsReadyForDisplay}
     />
   );
 };
@@ -248,19 +257,22 @@ export const combineArrays = (
  *
  * [[A - - B A A - B - A - B]]
  */
-const sliceSubArraysAndCat = (currScrollPosition: number, gridWidth: number) =>
+export const sliceSubArraysAndCat = (
+  currScrollPosition: number,
+  gridWidth: number
+) =>
   map((arr: number[]) =>
     arr.slice(currScrollPosition, currScrollPosition + gridWidth)
   );
 
 type Len9MarqueeProps = {
-  marqueeMessages: string[];
   gridWidth?: number;
+  marqueeMessages: string[];
 };
 
 export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
-  marqueeMessages,
   gridWidth = 60,
+  marqueeMessages,
 }) => {
   const [currScrollPosition, setCurrScrollPosition] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -346,8 +358,8 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
 
   return (
     <Len9DisplayComponent
-      len9={len9SlicedCharsReadyForDisplay}
       gridWidth={gridWidth}
+      len9={len9SlicedCharsReadyForDisplay}
     />
   );
 };

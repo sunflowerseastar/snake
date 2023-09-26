@@ -1,3 +1,17 @@
+:root {
+  --red: #ff2b2b;
+  --orange: #ffd3ad;
+  --black: #000;
+  --dark-gray: #222;
+  --medium-gray: #eee;
+  --light-gray: #f1f1f1;
+  --white: #fff;
+
+  --space-xs: 0.36em;
+  --space-sm: 0.6em;
+  --space-md: 1.8em;
+}
+
 body {
   margin: 0;
 }
@@ -40,18 +54,24 @@ body {
   grid-column: 1 / 1;
 }
 .block1 {
-  background: #000;
+  background: var(--black);
+}
+.highScore .block1 {
+  background: var(--light-gray);
+}
+.highScore.isHighScore .block1 {
+  background: var(--orange);
 }
 .block0 {
   background: none;
 }
 
 .snake {
-  background: #222;
+  background: var(--dark-gray);
   z-index: 1;
 }
 .food {
-  background: #ff2b2b;
+  background: var(--red);
   z-index: 1;
 }
 .board {
@@ -74,9 +94,9 @@ body {
 .bg-square-dark {
   background: repeating-linear-gradient(
     -45deg,
-    #f1f1f1,
-    #f1f1f1 2px,
-    #fff 2px,
-    #fff 4px
+    var(--light-gray),
+    var(--light-gray) 2px,
+    var(--white) 2px,
+    var(--white) 4px
   );
 }

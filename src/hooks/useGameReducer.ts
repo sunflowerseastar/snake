@@ -28,6 +28,7 @@ interface State {
   snake: Coordinate[];
   tickSpeedMs: number;
   highScore: number;
+  newHighScore: number;
 }
 
 type SnakeGameAction =
@@ -78,7 +79,7 @@ const initialBoardSize = 20;
 
 const getInitialState = () => {
   const initialSnake: Coordinate[] = [randomCoord(initialBoardSize)];
-  const highScore = localStorage.getItem("highScore")
+  const initialHighScore = localStorage.getItem("highScore")
     ? parseInt(localStorage.getItem("highScore")!)
     : 0;
 
@@ -91,7 +92,8 @@ const getInitialState = () => {
     lastDirectionMoved: undefined,
     snake: initialSnake,
     tickSpeedMs: 80,
-    highScore: highScore,
+    highScore: initialHighScore,
+    newHighScore: initialHighScore,
   };
 };
 
@@ -100,12 +102,16 @@ function stateReducer(state: State, action: SnakeGameAction): State {
     case "startGame":
       return getInitialState();
     case "endGame":
-      const highScore = Math.max(state.snake.length, state.highScore);
-      localStorage.setItem("highScore", highScore.toString());
+      /*
+       * newHighScore & highScore can be different during GamePlayState.over.
+       * This way the UI can know if a newHighScore was just achieved.
+       */
+      const newHighScore = Math.max(state.snake.length, state.highScore);
+      localStorage.setItem("highScore", newHighScore.toString());
       return {
         ...state,
         gamePlayState: GamePlayState.over,
-        highScore: highScore,
+        newHighScore,
       };
     case "moveSnake":
       const head = state.snake[0];
@@ -142,11 +148,16 @@ function stateReducer(state: State, action: SnakeGameAction): State {
         snake: isGameOver ? state.snake : newSnake,
       };
     case "pressSpace":
+      /*
+       * When the user presses SPC to go from GamePlayState.over to
+       * GamePlayState.ready, the newHighScore is copied into the highScore
+       * (which makes these undistinguishable again for the UI).
+       */
       return state.gamePlayState === GamePlayState.over
         ? {
             ...getInitialState(),
             gamePlayState: GamePlayState.ready,
-            highScore: state.highScore,
+            highScore: state.newHighScore,
           }
         : state.gamePlayState === GamePlayState.ready
         ? { ...state, gamePlayState: GamePlayState.unpaused }

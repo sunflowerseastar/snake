@@ -19,6 +19,7 @@ const App = () => {
     gamePlayState,
     highScore,
     isGameOver,
+    newHighScore,
     snake,
     tickSpeedMs,
   } = state;
@@ -53,7 +54,11 @@ const App = () => {
     <GameAreaContainer>
       <div>
         <div className="score-row">
-          <Score highScore={highScore} score={snake.length} />
+          <Score
+            highScore={Math.max(newHighScore, highScore)}
+            isHighScore={newHighScore > highScore}
+            score={snake.length}
+          />
         </div>
         <Board boardSize={boardSize}>
           <>
@@ -68,11 +73,13 @@ const App = () => {
             key={gamePlayState}
             marqueeMessages={
               gamePlayState === GamePlayState.ready
-                ? ["ready", "move: ^ _ < >", "spc: pause"]
+                ? ["ready", "^ _ < > move", "spc pause"]
                 : gamePlayState === GamePlayState.over
-                ? ["game over", "spc: reset"]
+                ? newHighScore > highScore
+                  ? ["game over", `new high: ${newHighScore}`, "spc reset"]
+                  : ["game over", "spc reset", `high score: ${newHighScore}`]
                 : gamePlayState === GamePlayState.paused
-                ? ["paused", "spc: unpause"]
+                ? ["paused", "spc unpause"]
                 : [""]
             }
           />
