@@ -63,6 +63,7 @@ const binaryLen9Chars: Record<string, number[]> = {
   "[": [1, 1, 1, 0, 1, 1],
   "]": [1, 1, 0, 1, 1, 1],
   ",": [0, 0, 0, 1, 1, 0],
+  "+": [0, 1, 0, 1, 1, 1, 0, 1, 0],
 };
 
 export const lookupLen9Char = (char: string): number[] =>
@@ -148,32 +149,49 @@ export const convertToLen9AndAddPadding = (
 
 type Len9DisplayComponentProps = {
   cx?: object;
-  gridWidth?: number;
+  isSmall?: boolean;
   len9: number[][];
 };
 
+/*
+ * See 'Magic len-9' comment in style.css.
+ *
+ * Roughly, each block is 1x1 of the grid. If the grid is, say, 50% viewport
+ * wide, and has exactly 50 columns, then every block will be 1% viewport-width
+ * long & tall.
+ *
+ * This correspondence of 1 grid template column to `min(1vw, 1vw)` is what
+ * keeps all the len 9 text sizing consistent.
+
+ * Note: the `1` of `block-1` means that that number in the
+ * len9 binary array is a 1.
+ */
 const Len9DisplayComponent: React.FC<Len9DisplayComponentProps> = ({
   cx = {},
-  gridWidth = 0,
+  isSmall = false,
   len9,
-}) => (
-  <div
-    className={classNames({ ...cx, "len-9-chars-grid": true })}
-    style={{
-      gridTemplateColumns: `repeat(${
-        gridWidth > 0 ? gridWidth : len9.length / 3
-      }, 1fr)`,
-    }}
-  >
-    {len9.flat().map((x, i) => (
-      <div key={i} className={x === 1 ? "block block1" : "block block0"}></div>
-    ))}
-  </div>
-);
+}) => {
+  return (
+    <div
+      className={classNames({ ...cx, "len-9-chars-grid": true })}
+      style={{
+        gridTemplateColumns: `repeat(${len9[0].length}, 1fr)`,
+        width: `min(${len9[0].length / (isSmall ? 1.3 : 1)}vw, ${
+          len9[0].length / (isSmall ? 1.3 : 1)
+        }vh)`,
+      }}
+    >
+      {len9.flat().map((x, i) => (
+        <div key={i} className={x === 1 ? "block block-1" : "block"}></div>
+      ))}
+    </div>
+  );
+};
 
 type Len9TextProps = {
   cx?: object;
   gridWidth?: number;
+  isSmall?: boolean;
   isRightAligned?: boolean;
   text: string;
 };
@@ -181,6 +199,7 @@ type Len9TextProps = {
 export const Len9Text: React.FC<Len9TextProps> = ({
   cx = {},
   gridWidth = 0,
+  isSmall = false,
   isRightAligned = false,
   text,
 }) => {
@@ -197,8 +216,8 @@ export const Len9Text: React.FC<Len9TextProps> = ({
 
   return (
     <Len9DisplayComponent
-      gridWidth={gridWidth}
       cx={cx}
+      isSmall={isSmall}
       len9={len9CharsReadyForDisplay}
     />
   );
@@ -271,7 +290,7 @@ type Len9MarqueeProps = {
 };
 
 export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
-  gridWidth = 60,
+  gridWidth = 70,
   marqueeMessages,
 }) => {
   const [currScrollPosition, setCurrScrollPosition] = useState(0);
@@ -356,10 +375,5 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
     ),
   ];
 
-  return (
-    <Len9DisplayComponent
-      gridWidth={gridWidth}
-      len9={len9SlicedCharsReadyForDisplay}
-    />
-  );
+  return <Len9DisplayComponent len9={len9SlicedCharsReadyForDisplay} />;
 };

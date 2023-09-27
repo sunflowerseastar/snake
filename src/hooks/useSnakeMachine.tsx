@@ -20,100 +20,110 @@ import React, {
 } from "react";
 import { assign, createMachine } from "xstate";
 import { useMachine } from "@xstate/react";
+import { Coordinate, Direction } from "../types";
+import {
+  isCoordInCoords,
+  isInBounds,
+  opposite,
+  randomCoord,
+  randomCoordThatAvoidsCoords,
+} from "./utilities";
 
 /*
  * Snake Xstate Machine
  */
 
-const INITIAL_BOARD_SIZE = 20;
-const TICK_INTERVAL_MS = 50; // snake speed
+const FALLBACK_BOARD_SIZE = 20;
+const FALLBACK_INTERVAL_MS = 60; // snake speed
 
-// types
+type Setting = {
+  incDecs: number[];
+  maxSettingValue: number;
+  minSettingValue: number;
+  settingValue: number;
+};
 
-export enum Direction {
-  ArrowUp = "ArrowUp",
-  ArrowDown = "ArrowDown",
-  ArrowLeft = "ArrowLeft",
-  ArrowRight = "ArrowRight",
-}
-
-type Coordinate = { x: number; y: number };
-export type Context = {
-  boardSize: number;
+type Context = {
   direction: Direction;
   food: Coordinate;
   highScore: number;
   lastDirectionMoved: Direction | undefined;
   marqueeMessages: string[];
   newHighScore: number;
+  settings: Map<string, Setting>;
+  settingsActiveIndex: number;
   snake: Coordinate[];
-  tickSpeedMs: number;
 };
 
 interface ArrowKeyEvent {
   type: "arrow key";
-  value: Direction;
+  arrowDirection: Direction;
+}
+interface IncreaseDecreaseEvent {
+  type: "increase/decrease";
+  settingValueIncDecAmount: number;
+  settingValueKey: string;
+}
+interface CycleEvent {
+  type: "cycle through settings";
+  cycleDirection: "forward" | "backward";
 }
 
-interface SpacebarEvent {
-  type: "spacebar";
-}
-
-export type MyEvents = ArrowKeyEvent | SpacebarEvent;
-
-// utilities
-
-export const isInBounds = (coord: Coordinate, boardSize: number): boolean =>
-  coord.x >= 0 && coord.y >= 0 && coord.x < boardSize && coord.y < boardSize;
-
-export const isCoordInCoords = (
-  coord: Coordinate,
-  coords: Coordinate[]
-): boolean => coords.some(({ x, y }) => x === coord.x && y === coord.y);
-
-export const opposite = (d: Direction) =>
-  d === "ArrowUp"
-    ? "ArrowDown"
-    : d === "ArrowDown"
-    ? "ArrowUp"
-    : d === "ArrowLeft"
-    ? "ArrowRight"
-    : "ArrowLeft";
-
-const randomInt = (boardSize: number) => Math.floor(Math.random() * boardSize);
-
-const randomCoord = (boardSize: number) => ({
-  x: randomInt(boardSize),
-  y: randomInt(boardSize),
-});
-
-const randomCoordThatAvoidsCoords = (
-  coordsToAvoid: Coordinate[],
-  boardSize: number
-): Coordinate => {
-  const possibleCoord = randomCoord(boardSize);
-  return isCoordInCoords(possibleCoord, coordsToAvoid)
-    ? randomCoordThatAvoidsCoords(coordsToAvoid, boardSize)
-    : possibleCoord;
-};
+export type MyEvents =
+  | ArrowKeyEvent
+  | IncreaseDecreaseEvent
+  | CycleEvent
+  | { type: "spacebar" }
+  | { type: "toggle menu" };
 
 const getInitialContext = () => {
-  const initialSnake: Coordinate[] = [randomCoord(INITIAL_BOARD_SIZE)];
-  const initialHighScore = localStorage.getItem("highScore")
+  const highScore = localStorage.getItem("highScore")
     ? parseInt(localStorage.getItem("highScore")!)
     : 0;
 
+  const speed = localStorage.getItem("speed")
+    ? parseInt(localStorage.getItem("speed")!)
+    : FALLBACK_BOARD_SIZE;
+  const boardSize = localStorage.getItem("board size")
+    ? parseInt(localStorage.getItem("board size")!)
+    : FALLBACK_BOARD_SIZE;
+
+  const initialSnake: Coordinate[] = [randomCoord(boardSize)];
+
+  // TODO add clear high score, wall options, other..?
+  const initialSettings = new Map();
+  initialSettings.set("speed", {
+    incDecs: [-100, -10, -1, 1, 10, 100],
+    maxSettingValue: 1000 * 60,
+    minSettingValue: 25,
+    settingValue: speed,
+  });
+  initialSettings.set("board size", {
+    incDecs: [-5, -1, 1, 5],
+    maxSettingValue: 40,
+    minSettingValue: 3,
+    settingValue: boardSize,
+  });
+
   return {
-    boardSize: INITIAL_BOARD_SIZE,
     direction: Direction.ArrowUp,
-    food: randomCoordThatAvoidsCoords(initialSnake, INITIAL_BOARD_SIZE),
-    highScore: initialHighScore,
+    food: randomCoordThatAvoidsCoords(initialSnake, boardSize),
+    highScore,
     lastDirectionMoved: undefined,
     marqueeMessages: [""],
-    newHighScore: initialHighScore,
+    newHighScore: highScore,
+    settings: initialSettings,
+    settingsActiveIndex: 0,
     snake: initialSnake,
-    tickSpeedMs: 80,
   };
+};
+
+const getActiveSettingKey = (
+  settings: Map<string, Setting>,
+  settingsActiveIndex: number
+): string => {
+  const keys = Array.from(settings.keys());
+  return keys[settingsActiveIndex];
 };
 
 export const snakeMachine = createMachine(
@@ -124,118 +134,171 @@ export const snakeMachine = createMachine(
     },
     context: getInitialContext(),
     id: "Snake",
-    initial: "ready",
+    initial: "menu closed",
     states: {
-      ready: {
-        entry: assign({
-          marqueeMessages: ["ready", "^ _ < > move", "spc pause"],
-        }),
-        on: {
-          "arrow key": {
-            actions: assign(({ event }) => {
-              const { value } = event as ArrowKeyEvent;
+      "menu closed": {
+        initial: "ready",
+        states: {
+          hist: {
+            type: "history",
+            history: "shallow",
+          },
+          ready: {
+            entry: assign({
+              marqueeMessages: ["ready", "^ _ < > move", "spc pause"],
+            }),
+            on: {
+              "arrow key": {
+                actions: assign(({ event }) => {
+                  const { arrowDirection } = event as ArrowKeyEvent;
+                  return {
+                    direction: arrowDirection,
+                  };
+                }),
+                target: "#Snake.menu closed.gameplay.unpaused",
+              },
+              spacebar: {
+                target: "#Snake.menu closed.gameplay.unpaused",
+              },
+            },
+          },
+          gameover: {
+            entry: assign(({ context: { highScore, snake } }) => {
+              /*
+               * newHighScore & highScore can be different during #Snake.gameover. This
+               * way the UI can know if a newHighScore was just achieved.
+               */
+              const newHighScore = Math.max(snake.length, highScore);
+              localStorage.setItem("highScore", newHighScore.toString());
+
               return {
-                direction: value,
+                marqueeMessages:
+                  newHighScore > highScore
+                    ? ["game over", `new high: ${newHighScore}`, "spc reset"]
+                    : ["game over", "spc reset", `high score: ${newHighScore}`],
+                newHighScore,
               };
             }),
-            target: "#Snake.gameplay.unpaused",
+            on: {
+              spacebar: {
+                actions: assign(({ context: { newHighScore } }) => ({
+                  ...getInitialContext(),
+                  /*
+                   * When the user presses SPC to go from GamePlayState.gameover to
+                   * GamePlayState.ready, the newHighScore is copied into the
+                   * highScore (which makes these undistinguishable again for the
+                   * UI).
+                   */
+                  highScore: newHighScore,
+                })),
+                target: "ready",
+              },
+            },
           },
-          spacebar: {
-            target: "#Snake.gameplay.unpaused",
+          gameplay: {
+            initial: "paused",
+            states: {
+              unpaused: {
+                entry: assign({
+                  marqueeMessages: [""],
+                }),
+                after: [
+                  {
+                    delay: ({ context: { settings } }) =>
+                      settings.get("speed")?.settingValue ||
+                      FALLBACK_INTERVAL_MS,
+                    guard: "is game over",
+                    target: "#Snake.menu closed.gameover",
+                  },
+                  {
+                    delay: ({ context: { settings } }) =>
+                      settings.get("speed")?.settingValue ||
+                      FALLBACK_INTERVAL_MS,
+                    actions: [
+                      {
+                        type: "move snake",
+                      },
+                    ],
+                    target: ".",
+                  },
+                ],
+                on: {
+                  spacebar: {
+                    target: "paused",
+                  },
+                  "arrow key": {
+                    guard: "is legal direction change",
+                    actions: assign(({ event }) => {
+                      const { arrowDirection } = event as ArrowKeyEvent;
+                      return {
+                        direction: arrowDirection,
+                      };
+                    }),
+                    reenter: true,
+                  },
+                },
+              },
+              paused: {
+                entry: assign({
+                  marqueeMessages: ["paused", "spc unpause"],
+                  food: ({ context: { food, settings, snake } }) => {
+                    const boardSize = settings.get("board size")?.settingValue!;
+                    return food.x >= boardSize || food.y >= boardSize
+                      ? randomCoordThatAvoidsCoords(snake, boardSize)
+                      : food;
+                  },
+                }),
+                on: {
+                  spacebar: {
+                    target: "unpaused",
+                  },
+                  "arrow key": {
+                    guard: "is legal direction change",
+                    actions: assign(({ event }) => {
+                      const { arrowDirection } = event as ArrowKeyEvent;
+                      return {
+                        direction: arrowDirection,
+                      };
+                    }),
+                    target: "unpaused",
+                  },
+                },
+              },
+            },
+          },
+        },
+        on: {
+          "toggle menu": {
+            target: "#Snake.menu open",
           },
         },
       },
-      gameplay: {
-        initial: "unpaused",
+      "menu open": {
+        initial: "settings",
         states: {
-          unpaused: {
-            entry: assign({
-              marqueeMessages: [""],
-            }),
-            after: {
-              INTERVAL: [
-                {
-                  guard: "is game over",
-                  target: "#Snake.over",
-                },
-                {
-                  actions: [
-                    {
-                      type: "move snake",
-                    },
-                  ],
-                  target: ".",
-                },
-              ],
-            },
+          settings: {
             on: {
-              spacebar: {
-                target: "paused",
+              "increase/decrease": {
+                actions: {
+                  type: "increase/decrease",
+                },
+                reenter: true,
               },
-              "arrow key": {
-                guard: "is legal direction change",
-                actions: assign(({ event }) => {
-                  const { value } = event as ArrowKeyEvent;
-                  return {
-                    direction: value,
-                  };
-                }),
+              "cycle through settings": {
+                actions: {
+                  type: "cycle through settings",
+                  params: {
+                    cycleDirection: "forward",
+                  },
+                },
                 reenter: true,
               },
             },
           },
-          paused: {
-            entry: assign({
-              marqueeMessages: ["paused", "spc unpause"],
-            }),
-            on: {
-              spacebar: {
-                target: "unpaused",
-              },
-              "arrow key": {
-                guard: "is legal direction change",
-                actions: assign(({ event }) => {
-                  const { value } = event as ArrowKeyEvent;
-                  return {
-                    direction: value,
-                  };
-                }),
-                target: "unpaused",
-              },
-            },
-          },
         },
-      },
-      over: {
-        entry: assign(({ context: { highScore, snake } }) => {
-          /*
-           * newHighScore & highScore can be different during #Snake.over. This
-           * way the UI can know if a newHighScore was just achieved.
-           */
-          const newHighScore = Math.max(snake.length, highScore);
-          localStorage.setItem("highScore", newHighScore.toString());
-
-          return {
-            marqueeMessages:
-              newHighScore > highScore
-                ? ["game over", `new high: ${newHighScore}`, "spc reset"]
-                : ["game over", "spc reset", `high score: ${newHighScore}`],
-            newHighScore,
-          };
-        }),
         on: {
-          spacebar: {
-            actions: assign(({ context: { newHighScore } }) => ({
-              ...getInitialContext(),
-              /*
-               * When the user presses SPC to go from GamePlayState.over to
-               * GamePlayState.ready, the newHighScore is copied into the
-               * highScore (which makes these undistinguishable again for the
-               * UI).
-               */
-              highScore: newHighScore,
-            })),
-            target: "ready",
+          "toggle menu": {
+            target: "#Snake.menu closed.hist",
           },
         },
       },
@@ -244,7 +307,9 @@ export const snakeMachine = createMachine(
   {
     actions: {
       "move snake": assign(
-        ({ context: { snake, direction, boardSize, food } }) => {
+        ({ context: { direction, food, settings, snake } }) => {
+          const boardSize = settings.get("board size")?.settingValue! as number;
+
           const head = snake[0];
 
           const newHead =
@@ -273,22 +338,57 @@ export const snakeMachine = createMachine(
           };
         }
       ),
+      "increase/decrease": assign({
+        settings: ({ context: { settings }, event }) => {
+          const { settingValueIncDecAmount, settingValueKey } =
+            event as IncreaseDecreaseEvent;
+          const activeSetting = settings.get(settingValueKey) as Setting;
+
+          const newSettingValue =
+            activeSetting.settingValue + settingValueIncDecAmount;
+
+          localStorage.setItem(settingValueKey, newSettingValue.toString());
+
+          return settings.set(settingValueKey, {
+            ...activeSetting,
+            settingValue: newSettingValue,
+          });
+        },
+      }),
+      "cycle through settings": assign({
+        settingsActiveIndex: ({
+          context: { settings, settingsActiveIndex },
+          event,
+        }) => {
+          const { cycleDirection } = event as CycleEvent;
+
+          return cycleDirection === "forward"
+            ? (settingsActiveIndex + 1) % settings.size
+            : settingsActiveIndex === 0
+            ? settings.size - 1
+            : settingsActiveIndex - 1;
+        },
+      }),
     },
     guards: {
       "is legal direction change": ({
         context: { lastDirectionMoved, snake },
         event,
       }) => {
-        const { value } = event as ArrowKeyEvent;
+        const { arrowDirection } = event as ArrowKeyEvent;
 
         // snake is not going back onto itself
         return !(
           snake.length > 1 &&
           lastDirectionMoved &&
-          value === opposite(lastDirectionMoved)
+          arrowDirection === opposite(lastDirectionMoved)
         );
       },
-      "is game over": ({ context: { snake, direction, boardSize } }) => {
+      "is game over": ({ context: { direction, settings, snake } }) => {
+        const boardSize =
+          (settings.get("board size")?.settingValue as number) ||
+          FALLBACK_BOARD_SIZE;
+
         const head = snake[0];
 
         const newHead =
@@ -305,16 +405,22 @@ export const snakeMachine = createMachine(
         return isHittingWall || isHittingSelf;
       },
     },
-    delays: { INTERVAL: TICK_INTERVAL_MS },
+    delays: { INTERVAL: FALLBACK_INTERVAL_MS },
   }
 );
 
 /*
- * Context and Provider
+ * React Context and Provider
  */
 
 type SnakeMachineReactContextType = {
-  context: Context;
+  isMenuOpen: boolean;
+  context: Context & {
+    activeSetting: Setting;
+    activeSettingKey: string;
+    boardSize: number;
+    speed: number;
+  };
   send: (event: MyEvents) => void;
 };
 const SnakeMachineReactContext = createReactContext<
@@ -328,10 +434,33 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
   children,
 }) => {
   const [xstate, send] = useMachine(snakeMachine);
+
+  /*
+   * The consuming side should have clean, friendly data.
+   * Derived data is set up here.
+   */
+  const boardSize =
+    (xstate.context.settings.get("board size")?.settingValue as number) ||
+    FALLBACK_BOARD_SIZE;
+  const speed =
+    (xstate.context.settings.get("speed")?.settingValue as number) ||
+    FALLBACK_BOARD_SIZE;
+
+  const { settings, settingsActiveIndex } = xstate.context;
+  const activeSettingKey = getActiveSettingKey(settings, settingsActiveIndex);
+  const activeSetting = settings.get(activeSettingKey) as Setting;
+
   return (
     <SnakeMachineReactContext.Provider
       value={{
-        context: xstate.context,
+        isMenuOpen: xstate.matches("menu open"),
+        context: {
+          ...xstate.context,
+          activeSetting,
+          activeSettingKey,
+          boardSize,
+          speed,
+        },
         send,
       }}
     >

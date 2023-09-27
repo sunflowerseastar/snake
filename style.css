@@ -1,8 +1,12 @@
 :root {
+  --blue: #91cdf2;
   --red: #ff2b2b;
   --orange: #ffd3ad;
   --black: #000;
   --dark-gray: #222;
+  --medium-gray-4: #ccc;
+  --medium-gray-3: #555;
+  --medium-gray-2: #e6e6e6;
   --medium-gray: #eee;
   --light-gray: #f1f1f1;
   --white: #fff;
@@ -10,79 +14,51 @@
   --space-xs: 0.36em;
   --space-sm: 0.6em;
   --space-md: 1.8em;
+
+  /* Magic len-9. See longer comment at .len-9-chars-grid */
+  --constraint: min(70vw, 70vh);
 }
 
 body {
   margin: 0;
 }
 
-.game-area-container {
+/*
+ * shared structure/container
+ */
+.main-content-container {
   height: 100vh;
-  display: flex;
   justify-content: space-around;
 }
-.game-area-container-inner {
+.main-content-container-inner {
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
+  align-items: center;
 }
-.score-row {
+.content-top-row {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: var(--constraint);
   padding-bottom: 1em;
 }
-.score-row > div {
-  flex: 1;
+.content-middle-row {
+  position: relative;
+  width: var(--constraint);
+  height: var(--constraint);
 }
-.status-row {
-  padding-top: 1em;
-}
-.len-9-chars-grid {
-  display: grid;
-  grid-template-columns: repeat(13, 1fr);
-  grid-auto-rows: 1fr;
-}
-.len-9-chars-grid::before {
-  content: "";
-  width: 0;
-  padding-bottom: 100%;
-  grid-row: 1 / 1;
-  grid-column: 1 / 1;
-}
-.len-9-chars-grid .block1:first-child,
-.len-9-chars-grid .block0:first-child {
-  grid-row: 1 / 1;
-  grid-column: 1 / 1;
-}
-.block1 {
-  background: var(--black);
-}
-.highScore .block1 {
-  background: var(--light-gray);
-}
-.highScore.isHighScore .block1 {
-  background: var(--orange);
-}
-.block0 {
-  background: none;
+.content-bottom-row {
+  box-sizing: border-box;
+  position: relative;
+  margin-top: 1em;
+  min-height: min(7vh, 7vw);
 }
 
-.snake {
-  background: var(--dark-gray);
-  z-index: 1;
-}
-.food {
-  background: var(--red);
-  z-index: 1;
-}
-.board {
-  display: grid;
-  gap: 1px;
-  width: min(70vh, 70vw);
-  height: min(70vh, 70vw);
-}
-.board-container {
-  position: relative;
-}
+/*
+ * board
+ */
 .bg-board {
   position: absolute;
   top: 0;
@@ -99,4 +75,148 @@ body {
     var(--white) 2px,
     var(--white) 4px
   );
+}
+.board {
+  display: grid;
+  gap: 1px;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * menu
+ */
+.menu.main-content-container {
+  position: absolute;
+  width: 100vw;
+  background: var(--white);
+  display: none;
+  z-index: 2;
+}
+.menu.main-content-container.isMenuOpen {
+  display: flex;
+}
+.menu .content-top-row > div {
+  display: flex;
+}
+.menu .content-bottom-row {
+  padding-top: calc(1em - min(2vw, 2vh));
+  width: 70vw;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+}
+
+/*
+ * gameplay
+ */
+.gameplay.main-content-container {
+  display: flex;
+}
+.snake {
+  background: var(--dark-gray);
+  z-index: 1;
+}
+.food {
+  background: var(--red);
+  z-index: 1;
+}
+
+/*
+ * buttons
+ */
+button {
+  display: block;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 0;
+  font-size: 0;
+}
+.button-toggle-menu {
+  position: absolute;
+  padding: min(2vw, 2vh);
+  top: 0;
+  right: 0;
+  z-index: 3;
+}
+.button-toggle-menu .len-9-chars-grid .block-1 {
+  background: var(--light-gray);
+}
+.button-toggle-menu:hover .len-9-chars-grid .block-1 {
+  background: var(--medium-gray-2);
+}
+.button-navigate .len-9-chars-grid .block-1 {
+  background: var(--black);
+}
+.button-navigate:hover .len-9-chars-grid .block-1 {
+  background: var(--medium-gray-3);
+}
+.button-inc-dec {
+  padding: min(1vw, 1vh);
+  margin: 0 min(2vw, 2vh);
+  border: min(1vw, 1vh) solid var(--black);
+}
+.button-inc-dec:hover {
+  background: var(--black);
+}
+.button-inc-dec .len-9-chars-grid .block-1 {
+  background: var(--black);
+}
+.button-inc-dec:hover .len-9-chars-grid .block-1 {
+  background: var(--white);
+}
+
+/*
+ * len-9
+ */
+.len-9-chars-grid {
+  display: inline-grid;
+  grid-auto-rows: 1fr;
+}
+
+/*
+* Magic len-9
+*
+* Grid row/column of 1 / 1, plus a grid::before with width 0 & padding-bottom
+* 100% makes each block a square that is 1x1 sized to the grid. This is what is
+* facilitating all the magic sizing, essentially. If the grid is, say, 70% the
+* width of the viewport AND it has 70 columns, then each block is going to end
+* up being exactly 1% viewport width wide and 1% viewport width tall.
+*
+* The idea behind the `min` part of `min(70vw, 70vh)` is that regardless of
+* whether the viewport is in portrait or landscape orientation, this will
+* provide the square edge length that constrained/proportional to the shorter
+* of viewport width | viewport height.
+*
+* See Len9DisplayComponent in Len9.tsx.
+*/
+.len-9-chars-grid::before {
+  content: "";
+  width: 0;
+  padding-bottom: 100%;
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
+}
+.len-9-chars-grid .block-1:first-child,
+.len-9-chars-grid .block:first-child {
+  grid-row: 1 / 1;
+  grid-column: 1 / 1;
+}
+.block-1 {
+  background: var(--black);
+}
+.active-setting .block-1 {
+  background: var(--black);
+}
+.active-setting-value .block-1 {
+  background: var(--blue);
+}
+.high-score .block-1 {
+  background: var(--light-gray);
+}
+.high-score.isHighScore .block-1 {
+  background: var(--orange);
 }

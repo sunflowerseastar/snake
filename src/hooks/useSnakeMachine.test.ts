@@ -1,10 +1,6 @@
 import { expect, test } from "vitest";
-import {
-  Direction,
-  isCoordInCoords,
-  isInBounds,
-  opposite,
-} from "./useSnakeMachine";
+import { isCoordInCoords, isInBounds, opposite } from "./utilities";
+import { Direction } from "../types";
 
 test("square xy coordinate is in/not-in the board boundary", () => {
   expect(isInBounds({ x: 0, y: 0 }, 20)).toEqual(true);

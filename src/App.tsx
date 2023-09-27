@@ -2,11 +2,12 @@ import { useEffect } from "react";
 
 import Board from "./components/Board";
 
-import GameAreaContainer from "./components/GameAreaContainer";
+import Menu from "./components/Menu";
 import Score from "./components/Score";
 import Square from "./components/Square";
-import { Direction, useSnakeMachine } from "./hooks/useSnakeMachine";
+import { Direction } from "./types";
 import { Len9Marquee } from "./components/Len9";
+import { useSnakeMachine } from "./hooks/useSnakeMachine";
 
 const App = () => {
   const {
@@ -24,7 +25,7 @@ const App = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (Object.values(Direction).includes(event.key as Direction)) {
-        send({ type: "arrow key", value: event.key as Direction });
+        send({ type: "arrow key", arrowDirection: event.key as Direction });
       } else if (event.key === " ") {
         send({ type: "spacebar" });
       }
@@ -36,9 +37,10 @@ const App = () => {
 
   return (
     <>
-      <GameAreaContainer>
-        <div>
-          <div className="score-row">
+      <Menu />
+      <div className="gameplay main-content-container">
+        <div className="main-content-container-inner">
+          <div className="content-top-row">
             <Score
               highScore={Math.max(newHighScore, highScore)}
               isHighScore={newHighScore > highScore}
@@ -53,14 +55,14 @@ const App = () => {
               <Square x={food.x} y={food.y} isFood />
             </>
           </Board>
-          <div className="status-row">
+          <div className="content-bottom-row status-row">
             <Len9Marquee
               key={marqueeMessages.join("")}
               marqueeMessages={marqueeMessages}
             />
           </div>
         </div>
-      </GameAreaContainer>
+      </div>
     </>
   );
 };

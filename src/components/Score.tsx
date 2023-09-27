@@ -10,11 +10,10 @@ const Score = ({
   score: number;
 }) => (
   <>
-    <Len9Text text={score.toString()} gridWidth={30} />
+    <Len9Text text={score.toString()} />
     <Len9Text
-      cx={{ isHighScore, highScore: true }}
+      cx={{ isHighScore, "high-score": true }}
       text={highScore.toString()}
-      gridWidth={30}
       isRightAligned
     />
   </>
