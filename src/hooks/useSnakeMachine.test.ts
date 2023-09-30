@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { isCoordInCoords, isInBounds, opposite } from "./utilities";
+import { isCoordInCoords, isInBounds, opposite } from "../utilities";
 import { Direction } from "../types";
 
 test("square xy coordinate is in/not-in the board boundary", () => {

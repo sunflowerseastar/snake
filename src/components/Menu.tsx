@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import AutoPlaySnakeBoard from "./AutoPlaySnakeBoard";
+import { SpeedDemonstrationBoard } from "./DemonstrationBoards";
 import { BgBoard } from "./Board";
 import { Len9Text } from "./Len9";
 import { useSnakeMachine } from "../hooks/useSnakeMachine";
@@ -88,7 +88,7 @@ export const Menu = () => {
             {activeSettingKey === "board size" && (
               <BgBoard boardSize={settingValue as number} />
             )}
-            {activeSettingKey === "speed" && <AutoPlaySnakeBoard />}
+            {activeSettingKey === "speed" && <SpeedDemonstrationBoard />}
           </div>
           <div className="content-bottom-row">
             {settingType === "numeric"

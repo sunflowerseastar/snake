@@ -1,13 +1,7 @@
-import { useEffect } from "react";
 import { assign, createMachine } from "xstate";
-import { useMachine } from "@xstate/react";
-
-import Board from "./Board";
-import Square from "./Square";
 import { Coordinate, Direction } from "../types";
-import { useSnakeMachine } from "../hooks/useSnakeMachine";
 
-type MiniContext = {
+type MiniSpeedContext = {
   boardSize: number;
   direction: Direction;
   snake: Coordinate[];
@@ -18,10 +12,10 @@ interface UpdateSpeedEvent {
   newSpeed: number;
 }
 
-export const miniSnakeMachine = createMachine(
+export const settingSpeedMachine = createMachine(
   {
     types: {} as {
-      context: MiniContext;
+      context: MiniSpeedContext;
       events: UpdateSpeedEvent;
     },
     context: ({
@@ -97,38 +91,3 @@ export const miniSnakeMachine = createMachine(
     },
   }
 );
-
-const AutoPlaySnakeBoard: React.FC = () => {
-  const {
-    context: { boardSize, speed },
-  } = useSnakeMachine();
-
-  const [xstate, send] = useMachine(miniSnakeMachine, {
-    input: {
-      boardSize,
-      speed,
-    },
-  });
-  const {
-    context: { snake },
-  } = xstate;
-
-  useEffect(() => {
-    send({
-      type: "update speed",
-      newSpeed: speed,
-    });
-  }, [speed]);
-
-  return (
-    <Board boardSize={boardSize}>
-      <>
-        {snake.map(({ x, y }) => (
-          <Square key={`${x}-${y}`} x={x} y={y} />
-        ))}
-      </>
-    </Board>
-  );
-};
-
-export default AutoPlaySnakeBoard;

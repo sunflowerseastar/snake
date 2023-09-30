@@ -1,4 +1,4 @@
-import { Coordinate, Direction } from "../types";
+import { Coordinate, Direction } from "./types";
 
 export const isInBounds = (coord: Coordinate, boardSize: number): boolean =>
   coord.x >= 0 && coord.y >= 0 && coord.x < boardSize && coord.y < boardSize;
