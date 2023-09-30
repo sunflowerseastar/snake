@@ -36,12 +36,19 @@ import {
 const FALLBACK_BOARD_SIZE = 20;
 const FALLBACK_INTERVAL_MS = 60; // snake speed
 
-type Setting = {
+type SettingEnum = {
+  type: "enum";
+  settingOptions: string[];
+  settingValue: number | string;
+};
+type SettingNumeric = {
+  type: "numeric";
   incDecs: number[];
   maxSettingValue: number;
   minSettingValue: number;
-  settingValue: number;
+  settingValue: number | string;
 };
+type Setting = SettingEnum | SettingNumeric;
 
 type Context = {
   direction: Direction;
@@ -55,24 +62,30 @@ type Context = {
   snake: Coordinate[];
 };
 
-interface ArrowKeyEvent {
+interface ArrowKeyPressEvent {
   type: "arrow key";
   arrowDirection: Direction;
 }
-interface IncreaseDecreaseEvent {
+interface SettingsIncreaseDecreaseEvent {
   type: "increase/decrease";
   settingValueIncDecAmount: number;
   settingValueKey: string;
 }
-interface CycleEvent {
+interface SettingsChooseEnumEvent {
+  type: "choose enum";
+  chosenOption: string;
+  settingValueKey: string;
+}
+interface SettingCycleEvent {
   type: "cycle through settings";
   cycleDirection: "forward" | "backward";
 }
 
 export type MyEvents =
-  | ArrowKeyEvent
-  | IncreaseDecreaseEvent
-  | CycleEvent
+  | ArrowKeyPressEvent
+  | SettingsIncreaseDecreaseEvent
+  | SettingsChooseEnumEvent
+  | SettingCycleEvent
   | { type: "spacebar" }
   | { type: "toggle menu" };
 
@@ -81,6 +94,7 @@ const getInitialContext = () => {
     ? parseInt(localStorage.getItem("highScore")!)
     : 0;
 
+  const wall = localStorage.getItem("wall") || "crash";
   const speed = localStorage.getItem("speed")
     ? parseInt(localStorage.getItem("speed")!)
     : FALLBACK_BOARD_SIZE;
@@ -90,15 +104,22 @@ const getInitialContext = () => {
 
   const initialSnake: Coordinate[] = [randomCoord(boardSize)];
 
-  // TODO add clear high score, wall options, other..?
+  // TODO add clear high score, color/theme, other..?
   const initialSettings = new Map();
+  initialSettings.set("wall", {
+    type: "enum",
+    settingOptions: ["crash", "wrap"],
+    settingValue: wall,
+  });
   initialSettings.set("speed", {
+    type: "numeric",
     incDecs: [-100, -10, -1, 1, 10, 100],
     maxSettingValue: 1000 * 60,
     minSettingValue: 25,
     settingValue: speed,
   });
   initialSettings.set("board size", {
+    type: "numeric",
     incDecs: [-5, -1, 1, 5],
     maxSettingValue: 40,
     minSettingValue: 3,
@@ -150,7 +171,7 @@ export const snakeMachine = createMachine(
             on: {
               "arrow key": {
                 actions: assign(({ event }) => {
-                  const { arrowDirection } = event as ArrowKeyEvent;
+                  const { arrowDirection } = event as ArrowKeyPressEvent;
                   return {
                     direction: arrowDirection,
                   };
@@ -229,7 +250,7 @@ export const snakeMachine = createMachine(
                   "arrow key": {
                     guard: "is legal direction change",
                     actions: assign(({ event }) => {
-                      const { arrowDirection } = event as ArrowKeyEvent;
+                      const { arrowDirection } = event as ArrowKeyPressEvent;
                       return {
                         direction: arrowDirection,
                       };
@@ -242,7 +263,8 @@ export const snakeMachine = createMachine(
                 entry: assign({
                   marqueeMessages: ["paused", "spc unpause"],
                   food: ({ context: { food, settings, snake } }) => {
-                    const boardSize = settings.get("board size")?.settingValue!;
+                    const boardSize = settings.get("board size")
+                      ?.settingValue! as number;
                     return food.x >= boardSize || food.y >= boardSize
                       ? randomCoordThatAvoidsCoords(snake, boardSize)
                       : food;
@@ -255,7 +277,7 @@ export const snakeMachine = createMachine(
                   "arrow key": {
                     guard: "is legal direction change",
                     actions: assign(({ event }) => {
-                      const { arrowDirection } = event as ArrowKeyEvent;
+                      const { arrowDirection } = event as ArrowKeyPressEvent;
                       return {
                         direction: arrowDirection,
                       };
@@ -284,6 +306,12 @@ export const snakeMachine = createMachine(
                 },
                 reenter: true,
               },
+              "choose enum": {
+                actions: {
+                  type: "choose enum",
+                },
+                reenter: true,
+              },
               "cycle through settings": {
                 actions: {
                   type: "cycle through settings",
@@ -309,17 +337,26 @@ export const snakeMachine = createMachine(
       "move snake": assign(
         ({ context: { direction, food, settings, snake } }) => {
           const boardSize = settings.get("board size")?.settingValue! as number;
+          const wallSetting = settings.get("wall")?.settingValue! as string;
 
           const head = snake[0];
 
           const newHead =
-            direction === "ArrowUp"
-              ? { x: head.x, y: head.y - 1 }
+            wallSetting === "crash"
+              ? direction === "ArrowUp"
+                ? { x: head.x, y: head.y - 1 }
+                : direction === "ArrowDown"
+                ? { x: head.x, y: head.y + 1 }
+                : direction === "ArrowLeft"
+                ? { x: head.x - 1, y: head.y }
+                : { x: head.x + 1, y: head.y }
+              : direction === "ArrowUp"
+              ? { x: head.x, y: head.y - 1 < 0 ? boardSize - 1 : head.y - 1 }
               : direction === "ArrowDown"
-              ? { x: head.x, y: head.y + 1 }
+              ? { x: head.x, y: head.y + 1 >= boardSize ? 0 : head.y + 1 }
               : direction === "ArrowLeft"
-              ? { x: head.x - 1, y: head.y }
-              : { x: head.x + 1, y: head.y };
+              ? { x: head.x - 1 < 0 ? boardSize - 1 : head.x - 1, y: head.y }
+              : { x: head.x + 1 >= boardSize ? 0 : head.x + 1, y: head.y };
 
           const isEatingFood = newHead.x === food.x && newHead.y === food.y;
 
@@ -341,11 +378,11 @@ export const snakeMachine = createMachine(
       "increase/decrease": assign({
         settings: ({ context: { settings }, event }) => {
           const { settingValueIncDecAmount, settingValueKey } =
-            event as IncreaseDecreaseEvent;
+            event as SettingsIncreaseDecreaseEvent;
           const activeSetting = settings.get(settingValueKey) as Setting;
 
           const newSettingValue =
-            activeSetting.settingValue + settingValueIncDecAmount;
+            (activeSetting.settingValue as number) + settingValueIncDecAmount;
 
           localStorage.setItem(settingValueKey, newSettingValue.toString());
 
@@ -355,12 +392,26 @@ export const snakeMachine = createMachine(
           });
         },
       }),
+      "choose enum": assign({
+        settings: ({ context: { settings }, event }) => {
+          const { chosenOption, settingValueKey } =
+            event as SettingsChooseEnumEvent;
+          const activeSetting = settings.get(settingValueKey) as Setting;
+
+          localStorage.setItem(settingValueKey, chosenOption);
+
+          return settings.set(settingValueKey, {
+            ...activeSetting,
+            settingValue: chosenOption,
+          });
+        },
+      }),
       "cycle through settings": assign({
         settingsActiveIndex: ({
           context: { settings, settingsActiveIndex },
           event,
         }) => {
-          const { cycleDirection } = event as CycleEvent;
+          const { cycleDirection } = event as SettingCycleEvent;
 
           return cycleDirection === "forward"
             ? (settingsActiveIndex + 1) % settings.size
@@ -375,7 +426,7 @@ export const snakeMachine = createMachine(
         context: { lastDirectionMoved, snake },
         event,
       }) => {
-        const { arrowDirection } = event as ArrowKeyEvent;
+        const { arrowDirection } = event as ArrowKeyPressEvent;
 
         // snake is not going back onto itself
         return !(
@@ -388,21 +439,30 @@ export const snakeMachine = createMachine(
         const boardSize =
           (settings.get("board size")?.settingValue as number) ||
           FALLBACK_BOARD_SIZE;
+        const wallSetting = settings.get("wall")?.settingValue! as string;
 
         const head = snake[0];
 
         const newHead =
-          direction === "ArrowUp"
-            ? { x: head.x, y: head.y - 1 }
+          wallSetting === "crash"
+            ? direction === "ArrowUp"
+              ? { x: head.x, y: head.y - 1 }
+              : direction === "ArrowDown"
+              ? { x: head.x, y: head.y + 1 }
+              : direction === "ArrowLeft"
+              ? { x: head.x - 1, y: head.y }
+              : { x: head.x + 1, y: head.y }
+            : direction === "ArrowUp"
+            ? { x: head.x, y: head.y - 1 < 0 ? boardSize - 1 : head.y - 1 }
             : direction === "ArrowDown"
-            ? { x: head.x, y: head.y + 1 }
+            ? { x: head.x, y: head.y + 1 >= boardSize ? 0 : head.y + 1 }
             : direction === "ArrowLeft"
-            ? { x: head.x - 1, y: head.y }
-            : { x: head.x + 1, y: head.y };
+            ? { x: head.x - 1 < 0 ? boardSize - 1 : head.x - 1, y: head.y }
+            : { x: head.x + 1 >= boardSize ? 0 : head.x + 1, y: head.y };
 
         const isHittingWall = !isInBounds(newHead, boardSize);
         const isHittingSelf = isCoordInCoords(newHead, snake);
-        return isHittingWall || isHittingSelf;
+        return isHittingSelf || (isHittingWall && wallSetting === "crash");
       },
     },
     delays: { INTERVAL: FALLBACK_INTERVAL_MS },

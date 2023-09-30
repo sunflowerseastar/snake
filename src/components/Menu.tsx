@@ -5,14 +5,19 @@ import { BgBoard } from "./Board";
 import { Len9Text } from "./Len9";
 import { useSnakeMachine } from "../hooks/useSnakeMachine";
 
-const IncDecButton = ({
+const UpdateSettingButton = ({
+  isActive = false,
   onClick,
   text,
 }: {
+  isActive?: boolean;
   onClick: React.MouseEventHandler;
   text: string;
 }) => (
-  <button className="button-inc-dec" onClick={onClick}>
+  <button
+    className={classNames({ "button-update-setting": true, isActive })}
+    onClick={onClick}
+  >
     <Len9Text isSmall={true} text={text} />
   </button>
 );
@@ -36,10 +41,9 @@ export const Menu = () => {
     send,
   } = useSnakeMachine();
 
-  const { incDecs, maxSettingValue, minSettingValue, settingValue } =
-    activeSetting;
+  const { type: settingType, settingValue } = activeSetting;
 
-  // TODO implement menu-board for speed
+  // TODO implement menu-board for wall
   return (
     <>
       <div
@@ -82,31 +86,48 @@ export const Menu = () => {
           </div>
           <div className="content-middle-row">
             {activeSettingKey === "board size" && (
-              <BgBoard boardSize={settingValue} />
+              <BgBoard boardSize={settingValue as number} />
             )}
             {activeSettingKey === "speed" && <AutoPlaySnakeBoard />}
           </div>
           <div className="content-bottom-row">
-            {incDecs.map((n) => {
-              const wouldGoBeyondMinOrMax =
-                n > 0
-                  ? settingValue + n > maxSettingValue
-                  : settingValue + n < minSettingValue;
-              return (
-                <IncDecButton
-                  key={n}
-                  text={`${n > 0 ? "+" : ""}${n}`}
-                  onClick={() => {
-                    !wouldGoBeyondMinOrMax &&
+            {settingType === "numeric"
+              ? activeSetting.incDecs.map((n) => {
+                  const wouldGoBeyondMinOrMax =
+                    n > 0
+                      ? (settingValue as number) + n >
+                        activeSetting.maxSettingValue
+                      : (settingValue as number) + n <
+                        activeSetting.minSettingValue;
+                  return (
+                    <UpdateSettingButton
+                      key={n}
+                      text={`${n > 0 ? "+" : ""}${n}`}
+                      onClick={() => {
+                        !wouldGoBeyondMinOrMax &&
+                          send({
+                            type: "increase/decrease",
+                            settingValueKey: activeSettingKey,
+                            settingValueIncDecAmount: n,
+                          });
+                      }}
+                    />
+                  );
+                })
+              : activeSetting.settingOptions.map((option) => (
+                  <UpdateSettingButton
+                    key={option}
+                    isActive={option === settingValue}
+                    onClick={() =>
                       send({
-                        type: "increase/decrease",
+                        type: "choose enum",
                         settingValueKey: activeSettingKey,
-                        settingValueIncDecAmount: n,
-                      });
-                  }}
-                />
-              );
-            })}
+                        chosenOption: option,
+                      })
+                    }
+                    text={option}
+                  />
+                ))}
           </div>
         </div>
       </div>

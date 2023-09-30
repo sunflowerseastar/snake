@@ -154,18 +154,28 @@ button {
 .button-navigate:hover .len-9-chars-grid .block-1 {
   background: var(--medium-gray-3);
 }
-.button-inc-dec {
+.button-update-setting {
   padding: min(1vw, 1vh);
   margin: 0 min(2vw, 2vh);
   border: min(1vw, 1vh) solid var(--black);
 }
-.button-inc-dec:hover {
+.button-update-setting.isActive {
+  border: min(1vw, 1vh) solid var(--blue);
+  background: var(--blue);
+}
+.button-update-setting.isActive .len-9-chars-grid .block-1 {
+  background: var(--white);
+}
+.button-update-setting.isActive:hover {
+  pointer-events: none;
+}
+.button-update-setting:hover {
   background: var(--black);
 }
-.button-inc-dec .len-9-chars-grid .block-1 {
+.button-update-setting .len-9-chars-grid .block-1 {
   background: var(--black);
 }
-.button-inc-dec:hover .len-9-chars-grid .block-1 {
+.button-update-setting:hover .len-9-chars-grid .block-1 {
   background: var(--white);
 }
 
