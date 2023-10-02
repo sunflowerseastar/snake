@@ -46,6 +46,7 @@ type SnakeMachineReactContextType = {
     activeSettingKey: string;
     boardSize: number;
     speed: number;
+    wall: string;
   };
   send: (event: MyEvents) => void;
 };
@@ -65,12 +66,11 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
    * The consuming side should have clean, friendly data.
    * Derived data is set up here.
    */
-  const boardSize =
-    (xstate.context.settings.get("board size")?.settingValue as number) ||
-    FALLBACK_BOARD_SIZE;
-  const speed =
-    (xstate.context.settings.get("speed")?.settingValue as number) ||
-    FALLBACK_BOARD_SIZE;
+  // TODO type
+  const boardSize = xstate.context.settings.get("board size")
+    ?.settingValue as number;
+  const speed = xstate.context.settings.get("speed")?.settingValue as number;
+  const wall = xstate.context.settings.get("wall")?.settingValue as string;
 
   const { settings, settingsActiveIndex } = xstate.context;
   const activeSettingKey = getActiveSettingKey(settings, settingsActiveIndex);
@@ -86,6 +86,7 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
           activeSettingKey,
           boardSize,
           speed,
+          wall,
         },
         send,
       }}

@@ -1,6 +1,8 @@
 :root {
   --blue: #91cdf2;
   --red: #ff2b2b;
+  --yellow: #faedb9;
+  --pink: #ffbad1;
   --orange: #ffd3ad;
   --black: #000;
   --dark-gray: #222;
@@ -90,12 +92,14 @@ body {
   position: absolute;
   width: 100vw;
   background: var(--white);
-  display: none;
-  z-index: 2;
-}
-.menu.main-content-container.isMenuOpen {
+  /* display: none; */
   display: flex;
+  z-index: 2;
+  /* border: 3px solid red !important; */
 }
+/* .menu.main-content-container.isMenuOpen { */
+/*   display: flex; */
+/* } */
 .menu .content-top-row > div {
   display: flex;
 }
@@ -113,13 +117,19 @@ body {
 .gameplay.main-content-container {
   display: flex;
 }
-.snake {
+.square.snake {
   background: var(--dark-gray);
   z-index: 1;
 }
-.food {
+.square.food {
   background: var(--red);
   z-index: 1;
+}
+.square {
+  /* border: 1px solid orange; */
+}
+.square.flash {
+  background: var(--yellow);
 }
 
 /*
@@ -161,13 +171,13 @@ button {
 }
 .button-update-setting.isActive {
   border: min(1vw, 1vh) solid var(--blue);
-  background: var(--blue);
+  background: var(--blue) !important;
 }
 .button-update-setting.isActive .len-9-chars-grid .block-1 {
   background: var(--white);
 }
 .button-update-setting.isActive:hover {
-  pointer-events: none;
+  cursor: default;
 }
 .button-update-setting:hover {
   background: var(--black);

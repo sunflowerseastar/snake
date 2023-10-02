@@ -34,10 +34,19 @@ const getInitialContext = () => {
 
   const initialSnake: Coordinate[] = [randomCoord(boardSize)];
 
-  // TODO add clear high score, color/theme, other..?
+  /*
+   * These Settings are an ordered map since the user can cycle ("navigate"
+   * forward and backward) through them in a fixed order, but each setting has
+   * its own key/val pairs.
+   *
+   * This wrinkles initial value extraction, ex.
+   * `settings.get("wall")?.settingValue!`, but simplifies
+   * cycling and event keying/lookup/updating.
+   */
   const initialSettings = new Map();
   initialSettings.set("wall", {
     type: "enum",
+    // TODO type
     settingOptions: ["crash", "wrap"],
     settingValue: wall,
   });
@@ -358,6 +367,7 @@ export const snakeMachine = createMachine(
         );
       },
       "is game over": ({ context: { direction, settings, snake } }) => {
+        // TODO type
         const boardSize =
           (settings.get("board size")?.settingValue as number) ||
           FALLBACK_BOARD_SIZE;
