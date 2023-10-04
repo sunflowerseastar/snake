@@ -12,7 +12,7 @@ const Score = ({
   <>
     <Len9Text text={score.toString()} />
     <Len9Text
-      cx={{ isHighScore, "high-score": true }}
+      cx={["high-score", { isHighScore }]}
       text={highScore.toString()}
       isRightAligned
     />

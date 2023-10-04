@@ -26,18 +26,18 @@ import {
 } from "../constants";
 
 const getInitialContext = () => {
+  const boardSize = localStorage.getItem("board size")
+    ? parseInt(localStorage.getItem("board size")!)
+    : FALLBACK_BOARD_SIZE;
   const highScore = localStorage.getItem("highScore")
     ? parseInt(localStorage.getItem("highScore")!)
     : 0;
-
-  const wall = localStorage.getItem("wall") || "crash";
   const overlap = localStorage.getItem("overlap") || "crash";
   const speed = localStorage.getItem("speed")
     ? parseInt(localStorage.getItem("speed")!)
     : FALLBACK_BOARD_SIZE;
-  const boardSize = localStorage.getItem("board size")
-    ? parseInt(localStorage.getItem("board size")!)
-    : FALLBACK_BOARD_SIZE;
+  const touch = localStorage.getItem("touch") || "mobile";
+  const wall = localStorage.getItem("wall") || "crash";
 
   const initialSnake: Coordinate[] = [randomCoord(boardSize)];
 
@@ -51,15 +51,18 @@ const getInitialContext = () => {
    * cycling and event keying/lookup/updating.
    */
   const initialSettings = new Map();
+  initialSettings.set("touch", {
+    type: "enum",
+    settingOptions: ["mobile", "off", "on"],
+    settingValue: touch,
+  });
   initialSettings.set("overlap", {
     type: "enum",
-    // TODO type
     settingOptions: ["crash", "thru"],
     settingValue: overlap,
   });
   initialSettings.set("wall", {
     type: "enum",
-    // TODO type
     settingOptions: ["crash", "wrap"],
     settingValue: wall,
   });
@@ -84,7 +87,7 @@ const getInitialContext = () => {
     food: randomCoordThatAvoidsCoords(initialSnake, boardSize),
     highScore,
     lastDirectionMoved: undefined,
-    marqueeMessages: [""],
+    marqueeMessages: { desktop: [""], touch: [""] },
     newHighScore: highScore,
     settings: initialSettings,
     settingsActiveIndex: 0,
@@ -112,7 +115,10 @@ export const snakeMachine = createMachine(
           ready: {
             entry: assign({
               crashflashCount: 0,
-              marqueeMessages: ["ready", "^ _ < > move", "spc pause"],
+              marqueeMessages: {
+                desktop: ["ready", "^ _ < > move", "spc pause"],
+                touch: ["ready", "^ _ < > move", "tap board to pause"],
+              },
             }),
             on: {
               "arrow key": {
@@ -141,8 +147,30 @@ export const snakeMachine = createMachine(
               return {
                 marqueeMessages:
                   newHighScore > highScore
-                    ? ["game over", `new high: ${newHighScore}`, "spc reset"]
-                    : ["game over", "spc reset", `high score: ${newHighScore}`],
+                    ? {
+                        desktop: [
+                          "game over",
+                          `new high: ${newHighScore}`,
+                          "spc reset",
+                        ],
+                        touch: [
+                          "game over",
+                          `new high: ${newHighScore}`,
+                          "tap board to reset",
+                        ],
+                      }
+                    : {
+                        desktop: [
+                          "game over",
+                          "spc reset",
+                          `high score: ${newHighScore}`,
+                        ],
+                        touch: [
+                          "game over",
+                          "tap board to reset",
+                          `high score: ${newHighScore}`,
+                        ],
+                      },
                 newHighScore,
               };
             }),
@@ -180,7 +208,7 @@ export const snakeMachine = createMachine(
             states: {
               unpaused: {
                 entry: assign({
-                  marqueeMessages: [""],
+                  marqueeMessages: { desktop: [""], touch: [""] },
                 }),
                 after: [
                   {
@@ -220,7 +248,10 @@ export const snakeMachine = createMachine(
               },
               paused: {
                 entry: assign({
-                  marqueeMessages: ["paused", "spc unpause"],
+                  marqueeMessages: {
+                    desktop: ["paused", "spc unpause"],
+                    touch: ["paused", "spc unpause"],
+                  },
                   food: ({ context: { food, settings, snake } }) => {
                     const boardSize = settings.get("board size")
                       ?.settingValue! as number;
@@ -379,10 +410,9 @@ export const snakeMachine = createMachine(
         );
       },
       "is game over": ({ context: { direction, settings, snake } }) => {
-        // TODO type
         const boardSize = settings.get("board size")?.settingValue as number;
-        const wall = settings.get("wall")?.settingValue as string;
         const overlap = settings.get("overlap")?.settingValue as string;
+        const wall = settings.get("wall")?.settingValue as string;
 
         if (overlap === "thru" && wall === "wrap") {
           return false;

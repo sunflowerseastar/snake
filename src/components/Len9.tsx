@@ -11,6 +11,7 @@ import {
   transduce,
   zip,
 } from "@thi.ng/transducers";
+import { cxProp } from "../types";
 
 const SCROLL_DELAY_MS = 3000;
 const SCROLL_SPEED_MS = 60;
@@ -148,7 +149,7 @@ export const convertToLen9AndAddPadding = (
   );
 
 type Len9DisplayComponentProps = {
-  cx?: object;
+  cx?: cxProp;
   isSmall?: boolean;
   len9: number[][];
 };
@@ -167,18 +168,22 @@ type Len9DisplayComponentProps = {
  * len9 binary array is a 1.
  */
 const Len9DisplayComponent: React.FC<Len9DisplayComponentProps> = ({
-  cx = {},
+  cx,
   isSmall = false,
   len9,
 }) => {
+  const width = `min(${len9[0].length / (isSmall ? 1.3 : 1)}vw, ${
+    len9[0].length / (isSmall ? 1.3 : 1)
+  }vh)`;
+
   return (
     <div
-      className={classNames({ ...cx, "len-9-chars-grid": true })}
+      className={
+        cx ? classNames("len-9-chars-grid", ...cx) : "len-9-chars-grid"
+      }
       style={{
         gridTemplateColumns: `repeat(${len9[0].length}, 1fr)`,
-        width: `min(${len9[0].length / (isSmall ? 1.3 : 1)}vw, ${
-          len9[0].length / (isSmall ? 1.3 : 1)
-        }vh)`,
+        width,
       }}
     >
       {len9.flat().map((x, i) => (
@@ -189,18 +194,19 @@ const Len9DisplayComponent: React.FC<Len9DisplayComponentProps> = ({
 };
 
 type Len9TextProps = {
-  cx?: object;
+  // TODO let cx be able to pass ex. ('menu', 'container-inner'), not just object
+  cx?: cxProp;
   gridWidth?: number;
-  isSmall?: boolean;
   isRightAligned?: boolean;
+  isSmall?: boolean;
   text: string;
 };
 
 export const Len9Text: React.FC<Len9TextProps> = ({
-  cx = {},
+  cx,
   gridWidth = 0,
-  isSmall = false,
   isRightAligned = false,
+  isSmall = false,
   text,
 }) => {
   /*
@@ -285,12 +291,22 @@ export const sliceSubArraysAndCat = (
   );
 
 type Len9MarqueeProps = {
+  cx?: cxProp;
   gridWidth?: number;
   marqueeMessages: string[];
 };
 
+/*
+ * gridWidth ends up being either vw or min(vw,vh). This is called
+ * `--square-edge-length` in style.css.
+ *
+ * This will go away with vertical scrolling.
+ *
+ * TODO refactor to vertical scroll
+ */
 export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
-  gridWidth = 70,
+  cx,
+  gridWidth = 96, // this is coupled with style.css "magic len-9"
   marqueeMessages,
 }) => {
   const [currScrollPosition, setCurrScrollPosition] = useState(0);
@@ -375,5 +391,5 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
     ),
   ];
 
-  return <Len9DisplayComponent len9={len9SlicedCharsReadyForDisplay} />;
+  return <Len9DisplayComponent cx={cx} len9={len9SlicedCharsReadyForDisplay} />;
 };

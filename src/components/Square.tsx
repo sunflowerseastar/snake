@@ -1,12 +1,13 @@
 import classNames from "classnames";
+import { cxProp } from "../types";
 
 const Square = ({
-  cx = {},
+  cx,
   x,
   y,
   isFood = false,
 }: {
-  cx?: object;
+  cx?: cxProp;
   x: number;
   y: number;
   isFood?: boolean;

@@ -74,7 +74,7 @@ export const OverlapDemonstrationBoard: React.FC = () => {
       <>
         {snake.map(({ x, y }, i) => (
           <Square
-            cx={{ flash: i === 0 && crashflashCount % 2 !== 0 }}
+            cx={[{ flash: i === 0 && crashflashCount % 2 !== 0 }]}
             key={`${x}-${y}-${i}`}
             x={x}
             y={y}
@@ -112,7 +112,7 @@ export const WallDemonstrationBoard: React.FC = () => {
       <>
         {snake.map(({ x, y }, i) => (
           <Square
-            cx={{ flash: i === 0 && crashflashCount % 2 !== 0 }}
+            cx={[{ flash: i === 0 && crashflashCount % 2 !== 0 }]}
             key={`${x}-${y}-${i}`}
             x={x}
             y={y}

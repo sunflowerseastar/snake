@@ -27,7 +27,10 @@ export type Context = {
   food: Coordinate;
   highScore: number;
   lastDirectionMoved: Direction | undefined;
-  marqueeMessages: string[];
+  marqueeMessages: {
+    desktop: string[];
+    touch: string[];
+  };
   newHighScore: number;
   settings: Map<string, Setting>;
   settingsActiveIndex: number;
@@ -60,3 +63,5 @@ export type MyEvents =
   | SettingCycleEvent
   | { type: "spacebar" }
   | { type: "toggle menu" };
+
+export type cxProp = (string | { [key: string]: boolean })[];

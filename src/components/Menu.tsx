@@ -40,23 +40,22 @@ const NavigateButton = ({
 
 export const Menu = () => {
   const {
-    context: { activeSetting, activeSettingKey },
+    context: { activeSetting, activeSettingKey, touch },
     isMenuOpen,
     send,
   } = useSnakeMachine();
 
   const { type: settingType, settingValue } = activeSetting;
 
-  // TODO implement menu-board for wall
   return (
     <>
       {isMenuOpen ? (
         <div
-          className={classNames({
-            // isMenuOpen,
-            menu: true,
-            "main-content-container": true,
-          })}
+          className={classNames(
+            "menu",
+            "main-content-container",
+            `touch-${touch}`
+          )}
         >
           <div className="main-content-container-inner">
             <div className="content-top-row">
@@ -71,11 +70,11 @@ export const Menu = () => {
               />
               <div>
                 <Len9Text
-                  cx={{ "active-setting": true }}
+                  cx={["active-setting"]}
                   text={`${activeSettingKey}: `}
                 />
                 <Len9Text
-                  cx={{ "active-setting-value": true }}
+                  cx={["active-setting-value"]}
                   text={`${settingValue}`}
                 />
               </div>
@@ -89,6 +88,7 @@ export const Menu = () => {
                 text=">"
               />
             </div>
+
             <div className="content-middle-row">
               {activeSettingKey === "board size" && (
                 <BgBoard boardSize={settingValue as number} />
@@ -97,6 +97,7 @@ export const Menu = () => {
               {activeSettingKey === "speed" && <SpeedDemonstrationBoard />}
               {activeSettingKey === "wall" && <WallDemonstrationBoard />}
             </div>
+
             <div className="content-bottom-row">
               {settingType === "numeric"
                 ? activeSetting.incDecs.map((n) => {
@@ -145,7 +146,7 @@ export const Menu = () => {
         onClick={() => send({ type: "toggle menu" })}
       >
         <Len9Text
-          cx={{ "toggle-icon": true, isMenuOpen }}
+          cx={["toggle-icon", { isMenuOpen }]}
           gridWidth={3}
           text={isMenuOpen ? "x" : "+"}
         />
