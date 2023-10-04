@@ -13,6 +13,7 @@ const App = () => {
   const {
     context: {
       boardSize,
+      crashflashCount,
       food,
       highScore,
       marqueeMessages,
@@ -52,6 +53,7 @@ const App = () => {
             <>
               {snake.map(({ x, y }, i) => (
                 <Square
+                  cx={{ flash: i === 0 && crashflashCount % 2 !== 0 }}
                   key={overlap ? `${x}-${y}-${i}` : `${x}-${y}`}
                   x={x}
                   y={y}

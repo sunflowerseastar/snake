@@ -22,6 +22,7 @@ type SettingNumeric = {
 export type Setting = SettingEnum | SettingNumeric;
 
 export type Context = {
+  crashflashCount: number;
   direction: Direction;
   food: Coordinate;
   highScore: number;

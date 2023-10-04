@@ -19,7 +19,11 @@ import {
   randomCoord,
   randomCoordThatAvoidsCoords,
 } from "../utilities";
-import { FALLBACK_BOARD_SIZE, FALLBACK_INTERVAL_MS } from "../constants";
+import {
+  CRASHFLASH_INTERVAL_MS,
+  FALLBACK_BOARD_SIZE,
+  FALLBACK_INTERVAL_MS,
+} from "../constants";
 
 const getInitialContext = () => {
   const highScore = localStorage.getItem("highScore")
@@ -75,6 +79,7 @@ const getInitialContext = () => {
   });
 
   return {
+    crashflashCount: 0,
     direction: Direction.ArrowUp,
     food: randomCoordThatAvoidsCoords(initialSnake, boardSize),
     highScore,
@@ -106,6 +111,7 @@ export const snakeMachine = createMachine(
           },
           ready: {
             entry: assign({
+              crashflashCount: 0,
               marqueeMessages: ["ready", "^ _ < > move", "spc pause"],
             }),
             on: {
@@ -140,6 +146,19 @@ export const snakeMachine = createMachine(
                 newHighScore,
               };
             }),
+            after: [
+              {
+                delay: CRASHFLASH_INTERVAL_MS,
+                // is not finished flashing
+                guard: ({ context: { crashflashCount } }) =>
+                  crashflashCount < 6,
+                actions: assign({
+                  crashflashCount: ({ context: { crashflashCount } }) =>
+                    crashflashCount + 1,
+                }),
+                target: "gameover",
+              },
+            ],
             on: {
               spacebar: {
                 actions: assign(({ context: { newHighScore } }) => ({

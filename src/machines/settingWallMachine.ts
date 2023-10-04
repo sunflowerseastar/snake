@@ -95,7 +95,8 @@ export const settingWallMachine = createMachine(
         after: [
           {
             delay: CRASHFLASH_INTERVAL_MS,
-            guard: "is not finished flashing",
+            // is not finished flashing
+            guard: ({ context: { crashflashCount } }) => crashflashCount < 6,
             actions: assign({
               crashflashCount: ({ context: { crashflashCount } }) =>
                 crashflashCount + 1,
@@ -157,8 +158,6 @@ export const settingWallMachine = createMachine(
           getNewHeadPosition(snake[0], direction, boardSize),
           boardSize
         ),
-      "is not finished flashing": ({ context: { crashflashCount } }) =>
-        crashflashCount < 6,
     },
   }
 );

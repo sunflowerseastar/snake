@@ -1,7 +1,6 @@
 import { assign, createMachine } from "xstate";
 import { Coordinate, Direction } from "../types";
 import {
-  getNewHeadPosition,
   getNewHeadPositionWithWrap,
   isCoordInCoords,
   newRandomDirection,
@@ -13,10 +12,10 @@ type MiniOverlapContext = {
   crashflashCount: number;
   direction: Direction;
   numMovesWithoutTurning: number;
-  snake: Coordinate[];
-  speed: number;
   // TODO type
   overlap: string;
+  snake: Coordinate[];
+  speed: number;
 };
 interface UpdateOverlapEvent {
   type: "update overlap";
@@ -96,7 +95,8 @@ export const settingOverlapMachine = createMachine(
         after: [
           {
             delay: CRASHFLASH_INTERVAL_MS,
-            guard: "is not finished flashing",
+            // is not finished flashing
+            guard: ({ context: { crashflashCount } }) => crashflashCount < 6,
             actions: assign({
               crashflashCount: ({ context: { crashflashCount } }) =>
                 crashflashCount + 1,
@@ -161,8 +161,6 @@ export const settingOverlapMachine = createMachine(
           getNewHeadPositionWithWrap(snake[0], direction, boardSize),
           snake
         ),
-      "is not finished flashing": ({ context: { crashflashCount } }) =>
-        crashflashCount < 6,
     },
   }
 );

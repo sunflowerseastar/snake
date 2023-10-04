@@ -127,9 +127,6 @@ body {
   background: var(--red);
   z-index: 1;
 }
-.square {
-  /* border: 1px solid orange; */
-}
 .square.flash {
   background: var(--yellow);
 }
