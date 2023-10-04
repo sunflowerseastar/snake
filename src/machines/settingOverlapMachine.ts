@@ -1,14 +1,14 @@
 import { assign, createMachine } from "xstate";
 import { Coordinate, Direction } from "../types";
 import {
-  isInBounds,
   getNewHeadPosition,
   getNewHeadPositionWithWrap,
+  isCoordInCoords,
   newRandomDirection,
 } from "../utilities";
 import { CRASHFLASH_INTERVAL_MS } from "../constants";
 
-type MiniWallContext = {
+type MiniOverlapContext = {
   boardSize: number;
   crashflashCount: number;
   direction: Direction;
@@ -16,33 +16,34 @@ type MiniWallContext = {
   snake: Coordinate[];
   speed: number;
   // TODO type
-  wall: string;
+  overlap: string;
 };
-interface UpdateWallEvent {
-  type: "update wall";
-  newWall: string;
+interface UpdateOverlapEvent {
+  type: "update overlap";
+  newOverlap: string;
 }
 
 const initSnake = (boardSize: number) => {
   const y = Math.ceil((boardSize - 1) / 2);
-  return Array.from({ length: 3 }, (_, i) => ({
-    x: Math.floor(y * 1.6) + i,
+  const len = Math.floor(boardSize * 0.75);
+  return Array.from({ length: len }, (_, i) => ({
+    x: Math.floor((boardSize - len) / 2) + i,
     y,
   }));
 };
 
-export const settingWallMachine = createMachine(
+export const settingOverlapMachine = createMachine(
   {
     types: {} as {
-      context: MiniWallContext;
-      events: UpdateWallEvent;
+      context: MiniOverlapContext;
+      events: UpdateOverlapEvent;
     },
     context: ({
-      input: { boardSize, wall },
+      input: { boardSize, overlap },
     }: {
       input: {
         boardSize: number;
-        wall: string;
+        overlap: string;
       };
     }) => {
       const snake = initSnake(boardSize);
@@ -53,7 +54,7 @@ export const settingWallMachine = createMachine(
         numMovesWithoutTurning: 0,
         snake,
         speed: 60,
-        wall: wall,
+        overlap: overlap,
       };
     },
     id: "MiniSnake",
@@ -66,7 +67,7 @@ export const settingWallMachine = createMachine(
         after: [
           {
             delay: ({ context: { speed } }) => speed,
-            guard: "is wall-crash and hitting a wall",
+            guard: "is crashing by overlapping itself",
             target: "crashflash",
           },
           {
@@ -80,11 +81,11 @@ export const settingWallMachine = createMachine(
           },
         ],
         on: {
-          "update wall": {
+          "update overlap": {
             actions: assign({
-              wall: ({ event }) => {
-                const { newWall } = event as UpdateWallEvent;
-                return newWall;
+              overlap: ({ event }) => {
+                const { newOverlap } = event as UpdateOverlapEvent;
+                return newOverlap;
               },
             }),
             reenter: true,
@@ -112,11 +113,11 @@ export const settingWallMachine = createMachine(
           },
         ],
         on: {
-          "update wall": {
+          "update overlap": {
             actions: assign({
-              wall: ({ event }) => {
-                const { newWall } = event as UpdateWallEvent;
-                return newWall;
+              overlap: ({ event }) => {
+                const { newOverlap } = event as UpdateOverlapEvent;
+                return newOverlap;
               },
             }),
             target: "unpaused",
@@ -131,6 +132,12 @@ export const settingWallMachine = createMachine(
         ({
           context: { boardSize, direction, numMovesWithoutTurning, snake },
         }) => {
+          const newHead = getNewHeadPositionWithWrap(
+            snake[0],
+            direction,
+            boardSize
+          );
+
           const isChangingDirection = Math.random() > 0.7;
 
           return {
@@ -140,22 +147,19 @@ export const settingWallMachine = createMachine(
             numMovesWithoutTurning: isChangingDirection
               ? 0
               : numMovesWithoutTurning + 1,
-            snake: [
-              getNewHeadPositionWithWrap(snake[0], direction, boardSize),
-              ...snake.slice(0, -1),
-            ],
+            snake: [newHead, ...snake.slice(0, -1)],
           };
         }
       ),
     },
     guards: {
-      "is wall-crash and hitting a wall": ({
-        context: { boardSize, direction, snake, wall },
+      "is crashing by overlapping itself": ({
+        context: { boardSize, direction, overlap, snake },
       }) =>
-        wall === "crash" &&
-        !isInBounds(
-          getNewHeadPosition(snake[0], direction, boardSize),
-          boardSize
+        overlap === "crash" &&
+        isCoordInCoords(
+          getNewHeadPositionWithWrap(snake[0], direction, boardSize),
+          snake
         ),
       "is not finished flashing": ({ context: { crashflashCount } }) =>
         crashflashCount < 6,

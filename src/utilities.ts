@@ -34,3 +34,53 @@ export const randomCoordThatAvoidsCoords = (
     ? randomCoordThatAvoidsCoords(coordsToAvoid, boardSize)
     : possibleCoord;
 };
+
+export const isLegalDirectionChange = (
+  newDirection: Direction,
+  previousDirection: Direction | undefined,
+  snake: Coordinate[]
+): boolean =>
+  !(
+    snake.length > 1 &&
+    previousDirection &&
+    newDirection === opposite(previousDirection)
+  );
+
+export const randomDirection = () =>
+  Object.values(Direction)[Math.floor(Math.random() * 4)];
+
+export const newRandomDirection = (
+  previousDirection: Direction | undefined,
+  snake: Coordinate[]
+): Direction => {
+  const possibleNewDirection = randomDirection();
+  return isLegalDirectionChange(possibleNewDirection, previousDirection, snake)
+    ? possibleNewDirection
+    : newRandomDirection(previousDirection, snake);
+};
+
+export const getNewHeadPosition = (
+  head: Coordinate,
+  direction: Direction,
+  boardSize: number
+): Coordinate =>
+  direction === "ArrowUp"
+    ? { x: head.x, y: head.y - 1 }
+    : direction === "ArrowDown"
+    ? { x: head.x, y: head.y + 1 }
+    : direction === "ArrowLeft"
+    ? { x: head.x - 1, y: head.y }
+    : { x: head.x + 1, y: head.y };
+
+export const getNewHeadPositionWithWrap = (
+  head: Coordinate,
+  direction: Direction,
+  boardSize: number
+): Coordinate =>
+  direction === "ArrowUp"
+    ? { x: head.x, y: head.y - 1 < 0 ? boardSize - 1 : head.y - 1 }
+    : direction === "ArrowDown"
+    ? { x: head.x, y: head.y + 1 >= boardSize ? 0 : head.y + 1 }
+    : direction === "ArrowLeft"
+    ? { x: head.x - 1 < 0 ? boardSize - 1 : head.x - 1, y: head.y }
+    : { x: head.x + 1 >= boardSize ? 0 : head.x + 1, y: head.y };

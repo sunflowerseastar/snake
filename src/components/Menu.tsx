@@ -1,6 +1,7 @@
 import classNames from "classnames";
 
 import {
+  OverlapDemonstrationBoard,
   SpeedDemonstrationBoard,
   WallDemonstrationBoard,
 } from "./DemonstrationBoards";
@@ -92,6 +93,7 @@ export const Menu = () => {
               {activeSettingKey === "board size" && (
                 <BgBoard boardSize={settingValue as number} />
               )}
+              {activeSettingKey === "overlap" && <OverlapDemonstrationBoard />}
               {activeSettingKey === "speed" && <SpeedDemonstrationBoard />}
               {activeSettingKey === "wall" && <WallDemonstrationBoard />}
             </div>

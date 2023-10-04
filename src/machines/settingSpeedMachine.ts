@@ -1,5 +1,6 @@
 import { assign, createMachine } from "xstate";
 import { Coordinate, Direction } from "../types";
+import { getNewHeadPositionWithWrap } from "../utilities";
 
 type MiniSpeedContext = {
   boardSize: number;
@@ -70,24 +71,12 @@ export const settingSpeedMachine = createMachine(
   },
   {
     actions: {
-      "move snake": assign(
-        ({ context: { boardSize, direction, snake, speed } }) => {
-          const head = snake[0];
-
-          const newHeadWithWallWrapping =
-            direction === "ArrowUp"
-              ? { x: head.x, y: head.y - 1 < 0 ? boardSize - 1 : head.y - 1 }
-              : direction === "ArrowDown"
-              ? { x: head.x, y: head.y + 1 >= boardSize ? 0 : head.y + 1 }
-              : direction === "ArrowLeft"
-              ? { x: head.x - 1 < 0 ? boardSize - 1 : head.x - 1, y: head.y }
-              : { x: head.x + 1 >= boardSize ? 0 : head.x + 1, y: head.y };
-
-          return {
-            snake: [newHeadWithWallWrapping, ...snake.slice(0, -1)],
-          };
-        }
-      ),
+      "move snake": assign({
+        snake: ({ context: { boardSize, direction, snake, speed } }) => [
+          getNewHeadPositionWithWrap(snake[0], direction, boardSize),
+          ...snake.slice(0, -1),
+        ],
+      }),
     },
   }
 );

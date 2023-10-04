@@ -11,9 +11,11 @@ import {
   SettingsIncreaseDecreaseEvent,
 } from "../types";
 import {
+  getNewHeadPosition,
+  getNewHeadPositionWithWrap,
   isCoordInCoords,
   isInBounds,
-  opposite,
+  isLegalDirectionChange,
   randomCoord,
   randomCoordThatAvoidsCoords,
 } from "../utilities";
@@ -25,6 +27,7 @@ const getInitialContext = () => {
     : 0;
 
   const wall = localStorage.getItem("wall") || "crash";
+  const overlap = localStorage.getItem("overlap") || "crash";
   const speed = localStorage.getItem("speed")
     ? parseInt(localStorage.getItem("speed")!)
     : FALLBACK_BOARD_SIZE;
@@ -44,6 +47,12 @@ const getInitialContext = () => {
    * cycling and event keying/lookup/updating.
    */
   const initialSettings = new Map();
+  initialSettings.set("overlap", {
+    type: "enum",
+    // TODO type
+    settingOptions: ["crash", "thru"],
+    settingValue: overlap,
+  });
   initialSettings.set("wall", {
     type: "enum",
     // TODO type
@@ -268,26 +277,12 @@ export const snakeMachine = createMachine(
       "move snake": assign(
         ({ context: { direction, food, settings, snake } }) => {
           const boardSize = settings.get("board size")?.settingValue! as number;
-          const wallSetting = settings.get("wall")?.settingValue! as string;
-
-          const head = snake[0];
+          const wall = settings.get("wall")?.settingValue! as string;
 
           const newHead =
-            wallSetting === "crash"
-              ? direction === "ArrowUp"
-                ? { x: head.x, y: head.y - 1 }
-                : direction === "ArrowDown"
-                ? { x: head.x, y: head.y + 1 }
-                : direction === "ArrowLeft"
-                ? { x: head.x - 1, y: head.y }
-                : { x: head.x + 1, y: head.y }
-              : direction === "ArrowUp"
-              ? { x: head.x, y: head.y - 1 < 0 ? boardSize - 1 : head.y - 1 }
-              : direction === "ArrowDown"
-              ? { x: head.x, y: head.y + 1 >= boardSize ? 0 : head.y + 1 }
-              : direction === "ArrowLeft"
-              ? { x: head.x - 1 < 0 ? boardSize - 1 : head.x - 1, y: head.y }
-              : { x: head.x + 1 >= boardSize ? 0 : head.x + 1, y: head.y };
+            wall === "crash"
+              ? getNewHeadPosition(snake[0], direction, boardSize)
+              : getNewHeadPositionWithWrap(snake[0], direction, boardSize);
 
           const isEatingFood = newHead.x === food.x && newHead.y === food.y;
 
@@ -358,43 +353,35 @@ export const snakeMachine = createMachine(
         event,
       }) => {
         const { arrowDirection } = event as ArrowKeyPressEvent;
-
-        // snake is not going back onto itself
-        return !(
-          snake.length > 1 &&
-          lastDirectionMoved &&
-          arrowDirection === opposite(lastDirectionMoved)
+        return isLegalDirectionChange(
+          arrowDirection,
+          lastDirectionMoved,
+          snake
         );
       },
       "is game over": ({ context: { direction, settings, snake } }) => {
         // TODO type
-        const boardSize =
-          (settings.get("board size")?.settingValue as number) ||
-          FALLBACK_BOARD_SIZE;
-        const wallSetting = settings.get("wall")?.settingValue! as string;
+        const boardSize = settings.get("board size")?.settingValue as number;
+        const wall = settings.get("wall")?.settingValue as string;
+        const overlap = settings.get("overlap")?.settingValue as string;
+
+        if (overlap === "thru" && wall === "wrap") {
+          return false;
+        }
 
         const head = snake[0];
 
         const newHead =
-          wallSetting === "crash"
-            ? direction === "ArrowUp"
-              ? { x: head.x, y: head.y - 1 }
-              : direction === "ArrowDown"
-              ? { x: head.x, y: head.y + 1 }
-              : direction === "ArrowLeft"
-              ? { x: head.x - 1, y: head.y }
-              : { x: head.x + 1, y: head.y }
-            : direction === "ArrowUp"
-            ? { x: head.x, y: head.y - 1 < 0 ? boardSize - 1 : head.y - 1 }
-            : direction === "ArrowDown"
-            ? { x: head.x, y: head.y + 1 >= boardSize ? 0 : head.y + 1 }
-            : direction === "ArrowLeft"
-            ? { x: head.x - 1 < 0 ? boardSize - 1 : head.x - 1, y: head.y }
-            : { x: head.x + 1 >= boardSize ? 0 : head.x + 1, y: head.y };
+          wall === "crash"
+            ? getNewHeadPosition(head, direction, boardSize)
+            : getNewHeadPositionWithWrap(head, direction, boardSize);
 
         const isHittingWall = !isInBounds(newHead, boardSize);
         const isHittingSelf = isCoordInCoords(newHead, snake);
-        return isHittingSelf || (isHittingWall && wallSetting === "crash");
+        return (
+          (isHittingSelf && overlap === "crash") ||
+          (isHittingWall && wall === "crash")
+        );
       },
     },
     delays: { INTERVAL: FALLBACK_INTERVAL_MS },

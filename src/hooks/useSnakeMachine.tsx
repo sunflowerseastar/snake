@@ -28,7 +28,6 @@ import {
   randomCoord,
   randomCoordThatAvoidsCoords,
 } from "../utilities";
-import { FALLBACK_BOARD_SIZE } from "../constants";
 import { snakeMachine } from "../machines/snakeMachine";
 
 const getActiveSettingKey = (
@@ -45,6 +44,7 @@ type SnakeMachineReactContextType = {
     activeSetting: Setting;
     activeSettingKey: string;
     boardSize: number;
+    overlap: string;
     speed: number;
     wall: string;
   };
@@ -69,6 +69,8 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
   // TODO type
   const boardSize = xstate.context.settings.get("board size")
     ?.settingValue as number;
+  const overlap = xstate.context.settings.get("overlap")
+    ?.settingValue as string;
   const speed = xstate.context.settings.get("speed")?.settingValue as number;
   const wall = xstate.context.settings.get("wall")?.settingValue as string;
 
@@ -85,6 +87,7 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
           activeSetting,
           activeSettingKey,
           boardSize,
+          overlap,
           speed,
           wall,
         },

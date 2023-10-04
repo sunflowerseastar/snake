@@ -17,6 +17,7 @@ const App = () => {
       highScore,
       marqueeMessages,
       newHighScore,
+      overlap,
       snake,
     },
     send,
@@ -49,8 +50,12 @@ const App = () => {
           </div>
           <Board boardSize={boardSize}>
             <>
-              {snake.map(({ x, y }) => (
-                <Square key={`${x}-${y}`} x={x} y={y} />
+              {snake.map(({ x, y }, i) => (
+                <Square
+                  key={overlap ? `${x}-${y}-${i}` : `${x}-${y}`}
+                  x={x}
+                  y={y}
+                />
               ))}
               <Square x={food.x} y={food.y} isFood />
             </>
