@@ -1,7 +1,11 @@
 import { Coordinate, Direction } from "./types";
 
-export const isInBounds = (coord: Coordinate, boardSize: number): boolean =>
-  coord.x >= 0 && coord.y >= 0 && coord.x < boardSize && coord.y < boardSize;
+export const isInBounds = (
+  coord: Coordinate,
+  boardWidth: number,
+  boardHeight: number
+): boolean =>
+  coord.x >= 0 && coord.y >= 0 && coord.x < boardWidth && coord.y < boardHeight;
 
 export const isCoordInCoords = (
   coord: Coordinate,
@@ -17,21 +21,24 @@ export const opposite = (d: Direction) =>
     ? "ArrowRight"
     : "ArrowLeft";
 
-export const randomInt = (boardSize: number) =>
-  Math.floor(Math.random() * boardSize);
+export const randomInt = (n: number) => Math.floor(Math.random() * n);
 
-export const randomCoord = (boardSize: number) => ({
-  x: randomInt(boardSize),
-  y: randomInt(boardSize),
+export const randomCoord = (
+  boardWidth: number,
+  boardHeight: number
+): Coordinate => ({
+  x: randomInt(boardWidth),
+  y: randomInt(boardHeight),
 });
 
 export const randomCoordThatAvoidsCoords = (
   coordsToAvoid: Coordinate[],
-  boardSize: number
+  boardWidth: number,
+  boardHeight: number
 ): Coordinate => {
-  const possibleCoord = randomCoord(boardSize);
+  const possibleCoord = randomCoord(boardWidth, boardHeight);
   return isCoordInCoords(possibleCoord, coordsToAvoid)
-    ? randomCoordThatAvoidsCoords(coordsToAvoid, boardSize)
+    ? randomCoordThatAvoidsCoords(coordsToAvoid, boardWidth, boardHeight)
     : possibleCoord;
 };
 
@@ -61,8 +68,7 @@ export const newRandomDirection = (
 
 export const getNewHeadPosition = (
   head: Coordinate,
-  direction: Direction,
-  boardSize: number
+  direction: Direction
 ): Coordinate =>
   direction === "ArrowUp"
     ? { x: head.x, y: head.y - 1 }
@@ -75,12 +81,22 @@ export const getNewHeadPosition = (
 export const getNewHeadPositionWithWrap = (
   head: Coordinate,
   direction: Direction,
-  boardSize: number
+  boardWidth: number,
+  boardHeight: number
 ): Coordinate =>
   direction === "ArrowUp"
-    ? { x: head.x, y: head.y - 1 < 0 ? boardSize - 1 : head.y - 1 }
+    ? { x: head.x, y: head.y - 1 < 0 ? boardHeight - 1 : head.y - 1 }
     : direction === "ArrowDown"
-    ? { x: head.x, y: head.y + 1 >= boardSize ? 0 : head.y + 1 }
+    ? { x: head.x, y: head.y + 1 >= boardHeight ? 0 : head.y + 1 }
     : direction === "ArrowLeft"
-    ? { x: head.x - 1 < 0 ? boardSize - 1 : head.x - 1, y: head.y }
-    : { x: head.x + 1 >= boardSize ? 0 : head.x + 1, y: head.y };
+    ? { x: head.x - 1 < 0 ? boardWidth - 1 : head.x - 1, y: head.y }
+    : { x: head.x + 1 >= boardWidth ? 0 : head.x + 1, y: head.y };
+
+export const initSnake = (boardWidth: number, boardHeight: number) => {
+  const y = Math.ceil((boardHeight - 1) / 2);
+  const len = Math.floor(boardWidth * 0.75);
+  return Array.from({ length: len }, (_, i) => ({
+    x: Math.floor((boardWidth - len) / 2) + i,
+    y,
+  }));
+};

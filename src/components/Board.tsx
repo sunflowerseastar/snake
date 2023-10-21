@@ -1,22 +1,28 @@
 interface BgBoardProps {
-  boardSize: number;
+  boardWidth: number;
+  boardHeight: number;
 }
 interface BoardProps {
-  boardSize: number;
+  boardWidth: number;
+  boardHeight: number;
   children: React.ReactElement;
 }
 
-export const BgBoard: React.FC<BgBoardProps> = ({ boardSize }) => (
+export const BgBoard: React.FC<BgBoardProps> = ({
+  boardWidth,
+  boardHeight,
+}) => (
   <div
     className="bg-board"
     style={{
-      gridTemplateColumns: `repeat(${boardSize}, 1fr)`,
-      gridTemplateRows: `repeat(${boardSize}, 1fr)`,
+      gridTemplateColumns: `repeat(${boardWidth}, 1fr)`,
+      gridTemplateRows: `repeat(${boardHeight}, 1fr)`,
+      aspectRatio: `${boardWidth} / ${boardHeight}`,
     }}
   >
-    {Array.from({ length: boardSize * boardSize }, (_, i) => {
-      const isBoardSizeOdd = boardSize % 2;
-      const isEvenRow = Math.floor(i / boardSize) % 2;
+    {Array.from({ length: boardWidth * boardHeight }, (_, i) => {
+      const isBoardSizeOdd = boardWidth % 2;
+      const isEvenRow = Math.floor(i / boardWidth) % 2;
       const isEveryOtherSquare = i % 2;
       const isDark = isBoardSizeOdd
         ? !isEveryOtherSquare
@@ -27,14 +33,15 @@ export const BgBoard: React.FC<BgBoardProps> = ({ boardSize }) => (
   </div>
 );
 
-const Board: React.FC<BoardProps> = ({ boardSize, children }) => (
+const Board: React.FC<BoardProps> = ({ boardWidth, boardHeight, children }) => (
   <div className="content-middle-row board-container">
-    <BgBoard boardSize={boardSize} />
+    <BgBoard boardWidth={boardWidth} boardHeight={boardHeight} />
     <div
       className="board"
       style={{
-        gridTemplateColumns: `repeat(${boardSize}, 1fr)`,
-        gridTemplateRows: `repeat(${boardSize}, 1fr)`,
+        gridTemplateColumns: `repeat(${boardWidth}, 1fr)`,
+        gridTemplateRows: `repeat(${boardHeight}, 1fr)`,
+        aspectRatio: `${boardWidth} / ${boardHeight}`,
       }}
     >
       {children}

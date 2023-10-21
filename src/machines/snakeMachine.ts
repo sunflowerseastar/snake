@@ -21,25 +21,29 @@ import {
 } from "../utilities";
 import {
   CRASHFLASH_INTERVAL_MS,
-  FALLBACK_BOARD_SIZE,
+  FALLBACK_BOARD_WIDTH,
+  FALLBACK_BOARD_HEIGHT,
   FALLBACK_INTERVAL_MS,
 } from "../constants";
 
 const getInitialContext = () => {
-  const boardSize = localStorage.getItem("board size")
-    ? parseInt(localStorage.getItem("board size")!)
-    : FALLBACK_BOARD_SIZE;
+  const boardWidth = localStorage.getItem("boardWidth")
+    ? parseInt(localStorage.getItem("boardWidth")!)
+    : FALLBACK_BOARD_WIDTH;
+  const boardHeight = localStorage.getItem("boardHeight")
+    ? parseInt(localStorage.getItem("boardHeight")!)
+    : FALLBACK_BOARD_HEIGHT;
   const highScore = localStorage.getItem("highScore")
     ? parseInt(localStorage.getItem("highScore")!)
     : 0;
   const overlap = localStorage.getItem("overlap") || "crash";
   const speed = localStorage.getItem("speed")
     ? parseInt(localStorage.getItem("speed")!)
-    : FALLBACK_BOARD_SIZE;
+    : FALLBACK_INTERVAL_MS;
   const touch = localStorage.getItem("touch") || "mobile";
   const wall = localStorage.getItem("wall") || "crash";
 
-  const initialSnake: Coordinate[] = [randomCoord(boardSize)];
+  const initialSnake: Coordinate[] = [randomCoord(boardWidth, boardHeight)];
 
   /*
    * These Settings are an ordered map since the user can cycle ("navigate"
@@ -73,18 +77,25 @@ const getInitialContext = () => {
     minSettingValue: 25,
     settingValue: speed,
   });
-  initialSettings.set("board size", {
+  initialSettings.set("boardWidth", {
     type: "numeric",
     incDecs: [-5, -1, 1, 5],
     maxSettingValue: 40,
     minSettingValue: 3,
-    settingValue: boardSize,
+    settingValue: boardWidth,
+  });
+  initialSettings.set("boardHeight", {
+    type: "numeric",
+    incDecs: [-5, -1, 1, 5],
+    maxSettingValue: 40,
+    minSettingValue: 3,
+    settingValue: boardHeight,
   });
 
   return {
     crashflashCount: 0,
     direction: Direction.ArrowUp,
-    food: randomCoordThatAvoidsCoords(initialSnake, boardSize),
+    food: randomCoordThatAvoidsCoords(initialSnake, boardWidth, boardHeight),
     highScore,
     lastDirectionMoved: undefined,
     marqueeMessages: { desktop: [""], touch: [""] },
@@ -253,10 +264,16 @@ export const snakeMachine = createMachine(
                     touch: ["paused", "spc unpause"],
                   },
                   food: ({ context: { food, settings, snake } }) => {
-                    const boardSize = settings.get("board size")
+                    const boardWidth = settings.get("boardWidth")
                       ?.settingValue! as number;
-                    return food.x >= boardSize || food.y >= boardSize
-                      ? randomCoordThatAvoidsCoords(snake, boardSize)
+                    const boardHeight = settings.get("boardHeight")
+                      ?.settingValue! as number;
+                    return food.x >= boardWidth || food.y >= boardHeight
+                      ? randomCoordThatAvoidsCoords(
+                          snake,
+                          boardWidth,
+                          boardHeight
+                        )
                       : food;
                   },
                 }),
@@ -326,13 +343,22 @@ export const snakeMachine = createMachine(
     actions: {
       "move snake": assign(
         ({ context: { direction, food, settings, snake } }) => {
-          const boardSize = settings.get("board size")?.settingValue! as number;
+          const boardWidth = settings.get("boardWidth")
+            ?.settingValue! as number;
+          const boardHeight = settings.get("boardHeight")
+            ?.settingValue! as number;
+
           const wall = settings.get("wall")?.settingValue! as string;
 
           const newHead =
             wall === "crash"
-              ? getNewHeadPosition(snake[0], direction, boardSize)
-              : getNewHeadPositionWithWrap(snake[0], direction, boardSize);
+              ? getNewHeadPosition(snake[0], direction)
+              : getNewHeadPositionWithWrap(
+                  snake[0],
+                  direction,
+                  boardWidth,
+                  boardHeight
+                );
 
           const isEatingFood = newHead.x === food.x && newHead.y === food.y;
 
@@ -341,7 +367,7 @@ export const snakeMachine = createMachine(
             : [newHead, ...snake.slice(0, -1)];
 
           const newFood = isEatingFood
-            ? randomCoordThatAvoidsCoords(newSnake, boardSize)
+            ? randomCoordThatAvoidsCoords(newSnake, boardWidth, boardHeight)
             : food;
 
           return {
@@ -410,7 +436,9 @@ export const snakeMachine = createMachine(
         );
       },
       "is game over": ({ context: { direction, settings, snake } }) => {
-        const boardSize = settings.get("board size")?.settingValue as number;
+        const boardWidth = settings.get("boardWidth")?.settingValue! as number;
+        const boardHeight = settings.get("boardHeight")
+          ?.settingValue! as number;
         const overlap = settings.get("overlap")?.settingValue as string;
         const wall = settings.get("wall")?.settingValue as string;
 
@@ -422,10 +450,15 @@ export const snakeMachine = createMachine(
 
         const newHead =
           wall === "crash"
-            ? getNewHeadPosition(head, direction, boardSize)
-            : getNewHeadPositionWithWrap(head, direction, boardSize);
+            ? getNewHeadPosition(head, direction)
+            : getNewHeadPositionWithWrap(
+                head,
+                direction,
+                boardWidth,
+                boardHeight
+              );
 
-        const isHittingWall = !isInBounds(newHead, boardSize);
+        const isHittingWall = !isInBounds(newHead, boardWidth, boardHeight);
         const isHittingSelf = isCoordInCoords(newHead, snake);
         return (
           (isHittingSelf && overlap === "crash") ||

@@ -8,8 +8,8 @@ import {
 import { Direction } from "./types";
 
 test("square xy coordinate is in/not-in the board boundary", () => {
-  expect(isInBounds({ x: 0, y: 0 }, 20)).toEqual(true);
-  expect(isInBounds({ x: 5, y: 0 }, 5)).toEqual(false);
+  expect(isInBounds({ x: 0, y: 0 }, 20, 20)).toEqual(true);
+  expect(isInBounds({ x: 5, y: 0 }, 5, 5)).toEqual(false);
 });
 test("a coordinate is/is-not contained in an array of coordinates", () => {
   expect(

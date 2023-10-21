@@ -16,12 +16,13 @@ import { useSnakeMachine } from "../hooks/useSnakeMachine";
  */
 export const SpeedDemonstrationBoard: React.FC = () => {
   const {
-    context: { boardSize, speed },
+    context: { boardWidth, boardHeight, speed },
   } = useSnakeMachine();
 
   const [xstate, send] = useMachine(settingSpeedMachine, {
     input: {
-      boardSize,
+      boardWidth,
+      boardHeight,
       speed,
     },
   });
@@ -37,7 +38,7 @@ export const SpeedDemonstrationBoard: React.FC = () => {
   }, [speed]);
 
   return (
-    <Board boardSize={boardSize}>
+    <Board boardWidth={boardWidth} boardHeight={boardHeight}>
       <>
         {snake.map(({ x, y }) => (
           <Square key={`${x}-${y}`} x={x} y={y} />
@@ -49,12 +50,13 @@ export const SpeedDemonstrationBoard: React.FC = () => {
 
 export const OverlapDemonstrationBoard: React.FC = () => {
   const {
-    context: { boardSize, overlap, wall },
+    context: { boardWidth, boardHeight, overlap, wall },
   } = useSnakeMachine();
 
   const [xstate, send] = useMachine(settingOverlapMachine, {
     input: {
-      boardSize,
+      boardWidth,
+      boardHeight,
       overlap,
     },
   });
@@ -70,7 +72,7 @@ export const OverlapDemonstrationBoard: React.FC = () => {
   }, [overlap]);
 
   return (
-    <Board boardSize={boardSize}>
+    <Board boardWidth={boardWidth} boardHeight={boardHeight}>
       <>
         {snake.map(({ x, y }, i) => (
           <Square
@@ -87,12 +89,13 @@ export const OverlapDemonstrationBoard: React.FC = () => {
 
 export const WallDemonstrationBoard: React.FC = () => {
   const {
-    context: { boardSize, wall },
+    context: { boardWidth, boardHeight, wall },
   } = useSnakeMachine();
 
   const [xstate, send] = useMachine(settingWallMachine, {
     input: {
-      boardSize,
+      boardWidth,
+      boardHeight,
       wall,
     },
   });
@@ -108,7 +111,7 @@ export const WallDemonstrationBoard: React.FC = () => {
   }, [wall]);
 
   return (
-    <Board boardSize={boardSize}>
+    <Board boardWidth={boardWidth} boardHeight={boardHeight}>
       <>
         {snake.map(({ x, y }, i) => (
           <Square

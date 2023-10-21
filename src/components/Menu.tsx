@@ -12,7 +12,13 @@ import { UpdateSettingButton } from "./Buttons";
 
 export const Menu = () => {
   const {
-    context: { activeSetting, activeSettingKey, touch },
+    context: {
+      activeSetting,
+      activeSettingKey,
+      boardWidth,
+      boardHeight,
+      touch,
+    },
     isMenuOpen,
     send,
   } = useSnakeMachine();
@@ -68,8 +74,17 @@ export const Menu = () => {
             </div>
 
             <div className="content-middle-row">
-              {activeSettingKey === "board size" && (
-                <BgBoard boardSize={settingValue as number} />
+              {activeSettingKey === "boardWidth" && (
+                <BgBoard
+                  boardWidth={settingValue as number}
+                  boardHeight={boardHeight}
+                />
+              )}
+              {activeSettingKey === "boardHeight" && (
+                <BgBoard
+                  boardWidth={boardWidth}
+                  boardHeight={settingValue as number}
+                />
               )}
               {activeSettingKey === "overlap" && <OverlapDemonstrationBoard />}
               {activeSettingKey === "speed" && <SpeedDemonstrationBoard />}

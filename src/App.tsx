@@ -14,7 +14,8 @@ import { useSnakeMachine } from "./hooks/useSnakeMachine";
 const App = () => {
   const {
     context: {
-      boardSize,
+      boardHeight,
+      boardWidth,
       crashflashCount,
       food,
       highScore,
@@ -59,7 +60,7 @@ const App = () => {
             />
           </div>
 
-          <Board boardSize={boardSize}>
+          <Board boardWidth={boardWidth} boardHeight={boardHeight}>
             <>
               {snake.map(({ x, y }, i) => (
                 <Square

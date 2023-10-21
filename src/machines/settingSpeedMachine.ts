@@ -3,7 +3,8 @@ import { Coordinate, Direction } from "../types";
 import { getNewHeadPositionWithWrap } from "../utilities";
 
 type MiniSpeedContext = {
-  boardSize: number;
+  boardWidth: number;
+  boardHeight: number;
   direction: Direction;
   snake: Coordinate[];
   speed: number;
@@ -23,18 +24,20 @@ export const settingSpeedMachine = createMachine(
       input,
     }: {
       input: {
-        boardSize: number;
+        boardWidth: number;
+        boardHeight: number;
         speed: number;
       };
     }) => {
-      const y = Math.ceil((input.boardSize - 1) / 2);
+      const y = Math.ceil((input.boardHeight - 1) / 2);
       const startX = Math.floor(y / 2);
       const snake = Array.from({ length: y }, (_, i) => ({
         x: startX + i,
         y,
       }));
       return {
-        boardSize: input.boardSize,
+        boardWidth: input.boardWidth,
+        boardHeight: input.boardHeight,
         direction: Direction.ArrowLeft,
         snake,
         speed: input.speed,
@@ -72,8 +75,13 @@ export const settingSpeedMachine = createMachine(
   {
     actions: {
       "move snake": assign({
-        snake: ({ context: { boardSize, direction, snake, speed } }) => [
-          getNewHeadPositionWithWrap(snake[0], direction, boardSize),
+        snake: ({ context: { boardWidth, boardHeight, direction, snake } }) => [
+          getNewHeadPositionWithWrap(
+            snake[0],
+            direction,
+            boardWidth,
+            boardHeight
+          ),
           ...snake.slice(0, -1),
         ],
       }),

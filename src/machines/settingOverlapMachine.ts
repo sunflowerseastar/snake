@@ -2,13 +2,15 @@ import { assign, createMachine } from "xstate";
 import { Coordinate, Direction } from "../types";
 import {
   getNewHeadPositionWithWrap,
+  initSnake,
   isCoordInCoords,
   newRandomDirection,
 } from "../utilities";
 import { CRASHFLASH_INTERVAL_MS } from "../constants";
 
 type MiniOverlapContext = {
-  boardSize: number;
+  boardWidth: number;
+  boardHeight: number;
   crashflashCount: number;
   direction: Direction;
   numMovesWithoutTurning: number;
@@ -22,15 +24,6 @@ interface UpdateOverlapEvent {
   newOverlap: string;
 }
 
-const initSnake = (boardSize: number) => {
-  const y = Math.ceil((boardSize - 1) / 2);
-  const len = Math.floor(boardSize * 0.75);
-  return Array.from({ length: len }, (_, i) => ({
-    x: Math.floor((boardSize - len) / 2) + i,
-    y,
-  }));
-};
-
 export const settingOverlapMachine = createMachine(
   {
     types: {} as {
@@ -38,16 +31,18 @@ export const settingOverlapMachine = createMachine(
       events: UpdateOverlapEvent;
     },
     context: ({
-      input: { boardSize, overlap },
+      input: { boardWidth, boardHeight, overlap },
     }: {
       input: {
-        boardSize: number;
+        boardWidth: number;
+        boardHeight: number;
         overlap: string;
       };
     }) => {
-      const snake = initSnake(boardSize);
+      const snake = initSnake(boardWidth, boardHeight);
       return {
-        boardSize: boardSize,
+        boardWidth: boardWidth,
+        boardHeight: boardHeight,
         crashflashCount: 0,
         direction: Direction.ArrowLeft,
         numMovesWithoutTurning: 0,
@@ -91,6 +86,7 @@ export const settingOverlapMachine = createMachine(
           },
         },
       },
+      // TODO fix crashflash (maybe css??)
       crashflash: {
         after: [
           {
@@ -106,7 +102,8 @@ export const settingOverlapMachine = createMachine(
           {
             delay: CRASHFLASH_INTERVAL_MS,
             actions: assign({
-              snake: ({ context: { boardSize } }) => initSnake(boardSize),
+              snake: ({ context: { boardWidth, boardHeight } }) =>
+                initSnake(boardWidth, boardHeight),
               direction: Direction.ArrowLeft,
             }),
             target: "unpaused",
@@ -130,12 +127,19 @@ export const settingOverlapMachine = createMachine(
     actions: {
       "move snake": assign(
         ({
-          context: { boardSize, direction, numMovesWithoutTurning, snake },
+          context: {
+            boardWidth,
+            boardHeight,
+            direction,
+            numMovesWithoutTurning,
+            snake,
+          },
         }) => {
           const newHead = getNewHeadPositionWithWrap(
             snake[0],
             direction,
-            boardSize
+            boardWidth,
+            boardHeight
           );
 
           const isChangingDirection = Math.random() > 0.7;
@@ -154,11 +158,16 @@ export const settingOverlapMachine = createMachine(
     },
     guards: {
       "is crashing by overlapping itself": ({
-        context: { boardSize, direction, overlap, snake },
+        context: { boardWidth, boardHeight, direction, overlap, snake },
       }) =>
         overlap === "crash" &&
         isCoordInCoords(
-          getNewHeadPositionWithWrap(snake[0], direction, boardSize),
+          getNewHeadPositionWithWrap(
+            snake[0],
+            direction,
+            boardWidth,
+            boardHeight
+          ),
           snake
         ),
     },

@@ -21,13 +21,6 @@ import React, {
 import { useMachine } from "@xstate/react";
 
 import { Context, MyEvents, Setting } from "../types";
-import {
-  isCoordInCoords,
-  isInBounds,
-  opposite,
-  randomCoord,
-  randomCoordThatAvoidsCoords,
-} from "../utilities";
 import { snakeMachine } from "../machines/snakeMachine";
 
 const getActiveSettingKey = (
@@ -43,7 +36,8 @@ type SnakeMachineReactContextType = {
   context: Context & {
     activeSetting: Setting;
     activeSettingKey: string;
-    boardSize: number;
+    boardWidth: number;
+    boardHeight: number;
     overlap: string;
     speed: number;
     touch: string;
@@ -68,8 +62,10 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
    * Derived data is set up here.
    */
   // TODO type
-  const boardSize = xstate.context.settings.get("board size")
-    ?.settingValue as number;
+  const boardWidth = xstate.context.settings.get("boardWidth")
+    ?.settingValue! as number;
+  const boardHeight = xstate.context.settings.get("boardHeight")
+    ?.settingValue! as number;
   const overlap = xstate.context.settings.get("overlap")
     ?.settingValue as string;
   const speed = xstate.context.settings.get("speed")?.settingValue as number;
@@ -87,7 +83,8 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
           ...xstate.context,
           activeSetting,
           activeSettingKey,
-          boardSize,
+          boardWidth,
+          boardHeight,
           overlap,
           speed,
           touch,

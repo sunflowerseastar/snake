@@ -24,6 +24,9 @@
   /* Magic len-9. See longer comment at .len-9-chars-grid */
   --square-edge-length: min(96vw, 66vh);
   --square-edge-length-full: min(96vw, 86vh);
+
+  --content-middle-row-height-max: max(100%, 66vh);
+  --content-middle-row-no-touch-max: max(100%, 86vh);
   --constraint-width: 96vw;
 }
 
@@ -76,39 +79,40 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* width: var(--square-edge-length); */
   width: 96vw;
   height: 6vh;
   margin: 0.5vh 0;
-  border: 3px solid green !important;
+  /* border: 3px solid green !important; */
 }
 .content-middle-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
   position: relative;
-  width: var(--square-edge-length);
-  height: var(--square-edge-length);
+  width: 96vw;
+  height: 66vh;
   /* border: 3px solid blue !important; */
 }
 .touch-off .content-middle-row {
-  width: var(--square-edge-length-full);
-  height: var(--square-edge-length-full);
+  height: 86vh;
   /* border: 3px solid red !important; */
 }
 @media (min-width: 768px) {
   .touch-mobile .content-middle-row {
-    width: var(--square-edge-length-full);
-    height: var(--square-edge-length-full);
+    height: 86vh;
     /* border: 3px solid purple !important; */
   }
 }
 .content-bottom-row {
+  display: grid;
+  justify-content: space-around;
   align-items: center;
   box-sizing: border-box;
   position: relative;
-  /* min-width: var(--square-edge-length); */
   width: 96vw;
   height: 6vh;
   margin: 0.5vh 0;
-  border: 3px solid green !important;
+  /* border: 3px solid green !important; */
 }
 .marquee-messages-row {
   /* width: var(--square-edge-length); */
@@ -120,11 +124,29 @@ body {
  */
 .bg-board {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
   right: 0;
-  bottom: 0;
+  transform: translateY(-50%);
   display: grid;
+  max-height: var(--content-middle-row-height-max);
+  margin: 0 auto;
+  max-width: 96vw;
+  /* border: 3px solid red !important; */
+  /* note gridTemplate & aspectRatio are controlled in Board.tsx */
+}
+.touch-off .bg-board {
+  max-height: var(--content-middle-row-no-touch-max);
+  /* border: 3px solid blue !important; */
+}
+@media (min-width: 768px) {
+  .touch-mobile .bg-board {
+    max-height: var(--content-middle-row-no-touch-max);
+    /* border: 3px solid purple !important; */
+  }
+}
+.bg-board > div {
+  aspect-ratio: 1 / 1;
 }
 .bg-square-dark {
   background: repeating-linear-gradient(
@@ -136,10 +158,26 @@ body {
   );
 }
 .board {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+
   display: grid;
   gap: 1px;
-  width: 100%;
-  height: 100%;
+  max-height: var(--content-middle-row-height-max);
+  margin: 0 auto;
+  /* note gridTemplate & aspectRatio are controlled in Board.tsx */
+  /* border: 3px solid red !important; */
+}
+.touch-off .board {
+  max-height: var(--content-middle-row-no-touch-max);
+}
+@media (min-width: 768px) {
+  .touch-mobile .board {
+    max-height: var(--content-middle-row-no-touch-max);
+  }
 }
 
 /*
@@ -168,7 +206,6 @@ body {
 .menu .content-bottom-row {
   display: flex;
   justify-content: center;
-  /* align-items: baseline; */
 }
 .menu .content-bottom-row .button-update-setting {
   margin: 0 min(2vw, 2vh);

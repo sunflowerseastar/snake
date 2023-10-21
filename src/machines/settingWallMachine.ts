@@ -1,6 +1,7 @@
 import { assign, createMachine } from "xstate";
 import { Coordinate, Direction } from "../types";
 import {
+  initSnake,
   isInBounds,
   getNewHeadPosition,
   getNewHeadPositionWithWrap,
@@ -9,7 +10,8 @@ import {
 import { CRASHFLASH_INTERVAL_MS } from "../constants";
 
 type MiniWallContext = {
-  boardSize: number;
+  boardWidth: number;
+  boardHeight: number;
   crashflashCount: number;
   direction: Direction;
   numMovesWithoutTurning: number;
@@ -23,14 +25,6 @@ interface UpdateWallEvent {
   newWall: string;
 }
 
-const initSnake = (boardSize: number) => {
-  const y = Math.ceil((boardSize - 1) / 2);
-  return Array.from({ length: 3 }, (_, i) => ({
-    x: Math.floor(y * 1.6) + i,
-    y,
-  }));
-};
-
 export const settingWallMachine = createMachine(
   {
     types: {} as {
@@ -38,16 +32,18 @@ export const settingWallMachine = createMachine(
       events: UpdateWallEvent;
     },
     context: ({
-      input: { boardSize, wall },
+      input: { boardWidth, boardHeight, wall },
     }: {
       input: {
-        boardSize: number;
+        boardWidth: number;
+        boardHeight: number;
         wall: string;
       };
     }) => {
-      const snake = initSnake(boardSize);
+      const snake = initSnake(boardWidth, boardHeight);
       return {
-        boardSize: boardSize,
+        boardWidth,
+        boardHeight,
         crashflashCount: 0,
         direction: Direction.ArrowLeft,
         numMovesWithoutTurning: 0,
@@ -106,7 +102,8 @@ export const settingWallMachine = createMachine(
           {
             delay: CRASHFLASH_INTERVAL_MS,
             actions: assign({
-              snake: ({ context: { boardSize } }) => initSnake(boardSize),
+              snake: ({ context: { boardWidth, boardHeight } }) =>
+                initSnake(boardWidth, boardHeight),
               direction: Direction.ArrowLeft,
             }),
             target: "unpaused",
@@ -130,7 +127,13 @@ export const settingWallMachine = createMachine(
     actions: {
       "move snake": assign(
         ({
-          context: { boardSize, direction, numMovesWithoutTurning, snake },
+          context: {
+            boardWidth,
+            boardHeight,
+            direction,
+            numMovesWithoutTurning,
+            snake,
+          },
         }) => {
           const isChangingDirection = Math.random() > 0.7;
 
@@ -142,7 +145,12 @@ export const settingWallMachine = createMachine(
               ? 0
               : numMovesWithoutTurning + 1,
             snake: [
-              getNewHeadPositionWithWrap(snake[0], direction, boardSize),
+              getNewHeadPositionWithWrap(
+                snake[0],
+                direction,
+                boardWidth,
+                boardHeight
+              ),
               ...snake.slice(0, -1),
             ],
           };
@@ -151,12 +159,13 @@ export const settingWallMachine = createMachine(
     },
     guards: {
       "is wall-crash and hitting a wall": ({
-        context: { boardSize, direction, snake, wall },
+        context: { boardWidth, boardHeight, direction, snake, wall },
       }) =>
         wall === "crash" &&
         !isInBounds(
-          getNewHeadPosition(snake[0], direction, boardSize),
-          boardSize
+          getNewHeadPosition(snake[0], direction),
+          boardWidth,
+          boardHeight
         ),
     },
   }
