@@ -8,35 +8,7 @@ import {
 import { BgBoard } from "./Board";
 import { Len9Text } from "./Len9";
 import { useSnakeMachine } from "../hooks/useSnakeMachine";
-
-const UpdateSettingButton = ({
-  isActive = false,
-  onClick,
-  text,
-}: {
-  isActive?: boolean;
-  onClick: React.MouseEventHandler;
-  text: string;
-}) => (
-  <button
-    className={classNames({ "button-update-setting": true, isActive })}
-    onClick={onClick}
-  >
-    <Len9Text isSmall={true} text={text} />
-  </button>
-);
-
-const NavigateButton = ({
-  onClick,
-  text,
-}: {
-  onClick: React.MouseEventHandler;
-  text: string;
-}) => (
-  <button className="button-navigate" onClick={onClick}>
-    <Len9Text text={text} />
-  </button>
-);
+import { UpdateSettingButton } from "./Buttons";
 
 export const Menu = () => {
   const {
@@ -59,15 +31,26 @@ export const Menu = () => {
         >
           <div className="main-content-container-inner">
             <div className="content-top-row">
-              <NavigateButton
-                onClick={() =>
-                  send({
-                    type: "cycle through settings",
-                    cycleDirection: "backward",
-                  })
-                }
-                text="<"
-              />
+              <div>
+                <UpdateSettingButton
+                  onClick={() =>
+                    send({
+                      type: "cycle through settings",
+                      cycleDirection: "backward",
+                    })
+                  }
+                  text="<"
+                />
+                <UpdateSettingButton
+                  onClick={() =>
+                    send({
+                      type: "cycle through settings",
+                      cycleDirection: "forward",
+                    })
+                  }
+                  text=">"
+                />
+              </div>
               <div>
                 <Len9Text
                   cx={["active-setting"]}
@@ -78,14 +61,9 @@ export const Menu = () => {
                   text={`${settingValue}`}
                 />
               </div>
-              <NavigateButton
-                onClick={() =>
-                  send({
-                    type: "cycle through settings",
-                    cycleDirection: "forward",
-                  })
-                }
-                text=">"
+              <UpdateSettingButton
+                onClick={() => send({ type: "toggle menu" })}
+                text={isMenuOpen ? "x" : "+"}
               />
             </div>
 
@@ -140,17 +118,6 @@ export const Menu = () => {
           </div>
         </div>
       ) : null}
-
-      <button
-        className="button-toggle-menu"
-        onClick={() => send({ type: "toggle menu" })}
-      >
-        <Len9Text
-          cx={["toggle-icon", { isMenuOpen }]}
-          gridWidth={3}
-          text={isMenuOpen ? "x" : "+"}
-        />
-      </button>
     </>
   );
 };

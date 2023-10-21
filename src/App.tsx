@@ -4,10 +4,11 @@ import classNames from "classnames";
 import Board from "./components/Board";
 
 import Menu from "./components/Menu";
-import Score from "./components/Score";
 import Square from "./components/Square";
 import { Direction } from "./types";
 import { Len9Marquee } from "./components/Len9";
+import { Len9Text } from "./components/Len9";
+import { UpdateSettingButton } from "./components/Buttons";
 import { useSnakeMachine } from "./hooks/useSnakeMachine";
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
       snake,
       touch,
     },
+    isMenuOpen,
     send,
   } = useSnakeMachine();
 
@@ -45,10 +47,15 @@ const App = () => {
       <div className={`main-content-container touch-${touch}`}>
         <div className="main-content-container-inner">
           <div className="content-top-row">
-            <Score
-              highScore={Math.max(newHighScore, highScore)}
-              isHighScore={newHighScore > highScore}
-              score={snake.length}
+            <Len9Text text={snake.length.toString()} />
+            <Len9Text
+              cx={["high-score", { isHighScore: newHighScore > highScore }]}
+              text={Math.max(newHighScore, highScore).toString()}
+              isRightAligned
+            />
+            <UpdateSettingButton
+              onClick={() => send({ type: "toggle menu" })}
+              text={isMenuOpen ? "x" : "+"}
             />
           </div>
 
