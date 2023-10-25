@@ -275,6 +275,9 @@ button {
   padding: min(1vw, 1vh);
   border: min(1vw, 1vh) solid var(--black);
 }
+.button-update-setting + .button-update-setting {
+  margin-left: 2vw;
+}
 .button-update-setting.isActive {
   border: min(1vw, 1vh) solid var(--blue);
   background: var(--blue) !important;
