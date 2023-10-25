@@ -62,9 +62,9 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
    * Derived data is set up here.
    */
   // TODO type
-  const boardWidth = xstate.context.settings.get("boardWidth")
+  const boardWidth = xstate.context.settings.get("board width")
     ?.settingValue! as number;
-  const boardHeight = xstate.context.settings.get("boardHeight")
+  const boardHeight = xstate.context.settings.get("board height")
     ?.settingValue! as number;
   const overlap = xstate.context.settings.get("overlap")
     ?.settingValue as string;

@@ -27,11 +27,11 @@ import {
 } from "../constants";
 
 const getInitialContext = () => {
-  const boardWidth = localStorage.getItem("boardWidth")
-    ? parseInt(localStorage.getItem("boardWidth")!)
+  const boardWidth = localStorage.getItem("board width")
+    ? parseInt(localStorage.getItem("board width")!)
     : FALLBACK_BOARD_WIDTH;
-  const boardHeight = localStorage.getItem("boardHeight")
-    ? parseInt(localStorage.getItem("boardHeight")!)
+  const boardHeight = localStorage.getItem("board height")
+    ? parseInt(localStorage.getItem("board height")!)
     : FALLBACK_BOARD_HEIGHT;
   const highScore = localStorage.getItem("highScore")
     ? parseInt(localStorage.getItem("highScore")!)
@@ -77,14 +77,14 @@ const getInitialContext = () => {
     minSettingValue: 25,
     settingValue: speed,
   });
-  initialSettings.set("boardWidth", {
+  initialSettings.set("board width", {
     type: "numeric",
     incDecs: [-5, -1, 1, 5],
     maxSettingValue: 40,
     minSettingValue: 3,
     settingValue: boardWidth,
   });
-  initialSettings.set("boardHeight", {
+  initialSettings.set("board height", {
     type: "numeric",
     incDecs: [-5, -1, 1, 5],
     maxSettingValue: 40,
@@ -264,9 +264,9 @@ export const snakeMachine = createMachine(
                     touch: ["paused", "spc unpause"],
                   },
                   food: ({ context: { food, settings, snake } }) => {
-                    const boardWidth = settings.get("boardWidth")
+                    const boardWidth = settings.get("board width")
                       ?.settingValue! as number;
-                    const boardHeight = settings.get("boardHeight")
+                    const boardHeight = settings.get("board height")
                       ?.settingValue! as number;
                     return food.x >= boardWidth || food.y >= boardHeight
                       ? randomCoordThatAvoidsCoords(
@@ -343,9 +343,9 @@ export const snakeMachine = createMachine(
     actions: {
       "move snake": assign(
         ({ context: { direction, food, settings, snake } }) => {
-          const boardWidth = settings.get("boardWidth")
+          const boardWidth = settings.get("board width")
             ?.settingValue! as number;
-          const boardHeight = settings.get("boardHeight")
+          const boardHeight = settings.get("board height")
             ?.settingValue! as number;
 
           const wall = settings.get("wall")?.settingValue! as string;
@@ -436,8 +436,8 @@ export const snakeMachine = createMachine(
         );
       },
       "is game over": ({ context: { direction, settings, snake } }) => {
-        const boardWidth = settings.get("boardWidth")?.settingValue! as number;
-        const boardHeight = settings.get("boardHeight")
+        const boardWidth = settings.get("board width")?.settingValue! as number;
+        const boardHeight = settings.get("board height")
           ?.settingValue! as number;
         const overlap = settings.get("overlap")?.settingValue as string;
         const wall = settings.get("wall")?.settingValue as string;

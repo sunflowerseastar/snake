@@ -74,13 +74,13 @@ export const Menu = () => {
             </div>
 
             <div className="content-middle-row">
-              {activeSettingKey === "boardWidth" && (
+              {activeSettingKey === "board width" && (
                 <BgBoard
                   boardWidth={settingValue as number}
                   boardHeight={boardHeight}
                 />
               )}
-              {activeSettingKey === "boardHeight" && (
+              {activeSettingKey === "board height" && (
                 <BgBoard
                   boardWidth={boardWidth}
                   boardHeight={settingValue as number}
