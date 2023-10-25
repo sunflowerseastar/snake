@@ -55,21 +55,6 @@ const getInitialContext = () => {
    * cycling and event keying/lookup/updating.
    */
   const initialSettings = new Map();
-  initialSettings.set("touch", {
-    type: "enum",
-    settingOptions: ["mobile", "off", "on"],
-    settingValue: touch,
-  });
-  initialSettings.set("overlap", {
-    type: "enum",
-    settingOptions: ["crash", "thru"],
-    settingValue: overlap,
-  });
-  initialSettings.set("wall", {
-    type: "enum",
-    settingOptions: ["crash", "wrap"],
-    settingValue: wall,
-  });
   initialSettings.set("speed", {
     type: "numeric",
     incDecs: [-100, -10, -1, 1, 10, 100],
@@ -90,6 +75,21 @@ const getInitialContext = () => {
     maxSettingValue: 40,
     minSettingValue: 3,
     settingValue: boardHeight,
+  });
+  initialSettings.set("wall", {
+    type: "enum",
+    settingOptions: ["crash", "wrap"],
+    settingValue: wall,
+  });
+  initialSettings.set("overlap", {
+    type: "enum",
+    settingOptions: ["crash", "thru"],
+    settingValue: overlap,
+  });
+  initialSettings.set("touch", {
+    type: "enum",
+    settingOptions: ["mobile", "off", "on"],
+    settingValue: touch,
   });
 
   return {
