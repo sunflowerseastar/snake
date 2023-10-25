@@ -86,6 +86,9 @@ export const Menu = () => {
                   boardHeight={settingValue as number}
                 />
               )}
+              {activeSettingKey === "touch" && (
+                <BgBoard boardWidth={boardWidth} boardHeight={boardHeight} />
+              )}
               {activeSettingKey === "overlap" && <OverlapDemonstrationBoard />}
               {activeSettingKey === "speed" && <SpeedDemonstrationBoard />}
               {activeSettingKey === "wall" && <WallDemonstrationBoard />}
