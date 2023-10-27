@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import classNames from "classnames";
 
 import {
@@ -6,6 +7,7 @@ import {
   WallDemonstrationBoard,
 } from "./DemonstrationBoards";
 import { BgBoard } from "./Board";
+import { Direction } from "../types";
 import { Len9Text } from "./Len9";
 import { useSnakeMachine } from "../hooks/useSnakeMachine";
 import { UpdateSettingButton } from "./Buttons";
@@ -24,6 +26,27 @@ export const Menu = () => {
   } = useSnakeMachine();
 
   const { type: settingType, settingValue } = activeSetting;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        send({ type: "toggle menu" });
+      } else if (event.key === "ArrowRight") {
+        send({
+          type: "cycle through settings",
+          cycleDirection: "forward",
+        });
+      } else if (event.key === "ArrowLeft") {
+        send({
+          type: "cycle through settings",
+          cycleDirection: "backward",
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [send]);
 
   return (
     <>
