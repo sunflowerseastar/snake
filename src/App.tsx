@@ -33,6 +33,16 @@ const App = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (Object.values(Direction).includes(event.key as Direction)) {
         send({ type: "arrow key", arrowDirection: event.key as Direction });
+      } else if (event.key === "h") {
+        send({ type: "arrow key", arrowDirection: Direction.ArrowLeft });
+      } else if (event.key === "j") {
+        send({ type: "arrow key", arrowDirection: Direction.ArrowDown });
+      } else if (event.key === "k") {
+        send({ type: "arrow key", arrowDirection: Direction.ArrowUp });
+      } else if (event.key === "l") {
+        send({ type: "arrow key", arrowDirection: Direction.ArrowRight });
+      } else if (event.key === "m") {
+        send({ type: "toggle menu" });
       } else if (event.key === " ") {
         send({ type: "spacebar" });
       }

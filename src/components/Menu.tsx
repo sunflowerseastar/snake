@@ -31,12 +31,12 @@ export const Menu = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         send({ type: "toggle menu" });
-      } else if (event.key === "ArrowRight") {
+      } else if (event.key === "l" || event.key === "ArrowRight") {
         send({
           type: "cycle through settings",
           cycleDirection: "forward",
         });
-      } else if (event.key === "ArrowLeft") {
+      } else if (event.key === "h" || event.key === "ArrowLeft") {
         send({
           type: "cycle through settings",
           cycleDirection: "backward",
