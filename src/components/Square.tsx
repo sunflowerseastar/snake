@@ -14,12 +14,22 @@ const Square = ({
 }) => (
   <div
     key={`${x}-${y}`}
-    className={classNames({
-      ...cx,
-      food: isFood,
-      snake: !isFood,
-      square: true,
-    })}
+    className={
+      cx
+        ? classNames(
+            {
+              food: isFood,
+              snake: !isFood,
+              square: true,
+            },
+            ...cx
+          )
+        : classNames({
+            food: isFood,
+            snake: !isFood,
+            square: true,
+          })
+    }
     style={{
       gridRowStart: y + 1,
       gridColumnStart: x + 1,
