@@ -1,11 +1,12 @@
 interface BgBoardProps {
-  boardWidth: number;
   boardHeight: number;
+  boardWidth: number;
 }
 interface BoardProps {
-  boardWidth: number;
   boardHeight: number;
+  boardWidth: number;
   children: React.ReactElement;
+  onClick?: React.MouseEventHandler;
 }
 
 export const BgBoard: React.FC<BgBoardProps> = ({
@@ -33,8 +34,13 @@ export const BgBoard: React.FC<BgBoardProps> = ({
   </div>
 );
 
-const Board: React.FC<BoardProps> = ({ boardWidth, boardHeight, children }) => (
-  <div className="content-middle-row board-container">
+const Board: React.FC<BoardProps> = ({
+  boardHeight,
+  boardWidth,
+  children,
+  onClick,
+}) => (
+  <div className="content-middle-row board-container" onClick={onClick}>
     <BgBoard boardWidth={boardWidth} boardHeight={boardHeight} />
     <div
       className="board"

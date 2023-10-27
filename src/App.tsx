@@ -60,7 +60,11 @@ const App = () => {
             />
           </div>
 
-          <Board boardWidth={boardWidth} boardHeight={boardHeight}>
+          <Board
+            boardWidth={boardWidth}
+            boardHeight={boardHeight}
+            onClick={() => send({ type: "spacebar" })}
+          >
             <>
               {snake.map(({ x, y }, i) => (
                 <Square
