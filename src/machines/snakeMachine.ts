@@ -11,6 +11,8 @@ import {
   SettingsIncreaseDecreaseEvent,
 } from "../types";
 import {
+  generateInitialBoardHeight,
+  generateInitialBoardWidth,
   getNewHeadPosition,
   getNewHeadPositionWithWrap,
   isCoordInCoords,
@@ -19,20 +21,17 @@ import {
   randomCoord,
   randomCoordThatAvoidsCoords,
 } from "../utilities";
-import {
-  CRASHFLASH_INTERVAL_MS,
-  FALLBACK_BOARD_WIDTH,
-  FALLBACK_BOARD_HEIGHT,
-  FALLBACK_INTERVAL_MS,
-} from "../constants";
+import { CRASHFLASH_INTERVAL_MS, FALLBACK_INTERVAL_MS } from "../constants";
 
 const getInitialContext = () => {
+  console.log("getInitialContext()");
+  const touch = localStorage.getItem("touch") || "responsive";
   const boardWidth = localStorage.getItem("board width")
     ? parseInt(localStorage.getItem("board width")!)
-    : FALLBACK_BOARD_WIDTH;
+    : generateInitialBoardWidth();
   const boardHeight = localStorage.getItem("board height")
     ? parseInt(localStorage.getItem("board height")!)
-    : FALLBACK_BOARD_HEIGHT;
+    : generateInitialBoardHeight(touch);
   const highScore = localStorage.getItem("highScore")
     ? parseInt(localStorage.getItem("highScore")!)
     : 0;
@@ -40,7 +39,6 @@ const getInitialContext = () => {
   const speed = localStorage.getItem("speed")
     ? parseInt(localStorage.getItem("speed")!)
     : FALLBACK_INTERVAL_MS;
-  const touch = localStorage.getItem("touch") || "responsive";
   const wall = localStorage.getItem("wall") || "crash";
 
   const initialSnake: Coordinate[] = [randomCoord(boardWidth, boardHeight)];

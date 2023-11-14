@@ -1,5 +1,7 @@
 import { expect, test } from "vitest";
 import {
+  generateInitialBoardHeight,
+  generateInitialBoardWidth,
   isCoordInCoords,
   isInBounds,
   isLegalDirectionChange,
@@ -46,4 +48,12 @@ test("legal direction changes", () => {
       { x: 1, y: 1 },
     ])
   ).toEqual(true);
+});
+test("board size generation", () => {
+  expect(generateInitialBoardHeight("responsive", 415)).toEqual(8);
+  expect(generateInitialBoardHeight("off", 415)).toEqual(8);
+  expect(generateInitialBoardHeight("responsive", 1015)).toEqual(19);
+  expect(generateInitialBoardHeight("on", 1015)).toEqual(15);
+  expect(generateInitialBoardWidth(639)).toEqual(13);
+  expect(generateInitialBoardWidth(1100)).toEqual(22);
 });
