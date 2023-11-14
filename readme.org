@@ -1,11 +1,87 @@
-* snake
+* Snake
 
-This is a web version of the classic snake game, built with React.
+This is a web version of the classic snake game.
 
 #+begin_src sh
 bun i
-bun dev           # vite, localhost:5173
-bun build
+yarn dev          # vite, localhost:5173
+yarn build
 yarn test         # to use vitest
 bun test --watch  # to use bun test
 #+end_src
+
+It is written with [[https://react.dev/][React 18]], [[https://stately.ai/docs/xstate][XState 5]], and [[https://github.com/thi-ng/umbrella/tree/develop/packages/transducers][thi.ng/transducers]].
+
+* Game Play
+
+** Navigation
+
+*Keyboard:*
+
+| control set | left | down | up | right |
+|-------------+------+------+----+-------|
+| arrow       | ←    | ↓    | ↑  | →     |
+| hjkl        | h    | j    | k  | l     |
+
+*Mobile:* gamepad shows ~< 768~ viewport width when the *touch* setting is /responsive/, and shows for all sizes when the *touch* setting is /on/.
+
+** Settings
+
+- *Speed:* snake velocity in MS
+- *Board width & board height:* what you expect =)
+- *Overlap:* game over if the snake hits itself
+- *Wall:* game over if the snake hits a wall
+- *Touch:* whether or not to show the gamepad
+
+Settings persist via local storage. Board width & board height are calculated in order to adjust to the viewport width & height unless they have been customized.
+
+** High Score
+
+Like Settings, High Score persists via local storage.
+
+* Codebase
+
+** Build
+
+Run ~bun build~ to build with [[https://vitejs.dev/][Vite]].
+
+** Dependencies
+
+| dependency         | purpose                             |
+|--------------------+-------------------------------------|
+| [[https://bun.sh/][Bun]]                | packages, testing                   |
+| [[https://vitejs.dev/][Vite]]               | bundling, local dev, build, testing |
+| [[https://react.dev/][React]]              | frontend library/architecture       |
+| [[https://stately.ai/docs/xstate][XState]]             | state management                    |
+| [[https://github.com/thi-ng/umbrella/tree/develop/packages/transducers][thi.ng/transducers]] | have fun with FP                    |
+| [[https://github.com/JedWatson/classnames][classnames]]         | help with vanilla css               |
+
+** Site Structure
+
+#+begin_src
+.
+├── dist
+└── src
+    ├── components
+    ├── hooks
+    ├── machines
+    └── stories
+#+end_src
+
+** State & Context
+
+React & XState have overlapping terminology, so beware the homonyms.
+
+What is often thought of (in React world, at least) as "app state" is in this app the XState [[https://stately.ai/docs/context][context]]. The XState [[https://stately.ai/docs/states][states]] themselves are [[https://stately.ai/docs/state-machines-and-statecharts][statechart states]].
+
+This XState context plugs into the React app via a React [[https://react.dev/reference/react/useContext][context]] [[https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context][provider]]. Note that a React context is agnostic as to what type of app state it's providing to the app; the fact that it just so happens to be providing something that's also called "context" is coincidental.
+
+|----------------+---------------------------------------------------------------------|
+| XState Context | management of the app's values that change over time                |
+| XState States  | a model of the app in terms of statechart states                    |
+| React Context  | an arbitrary collection of app state that can reach all descendants |
+| React Provider | a given React context's root component                              |
+
+** Test
+
+Run unit tests with ~yarn test~ for [[https://vitest.dev/][Vitest]] or ~bun test --watch~ for [[https://bun.sh/docs/cli/test][bun test]]. Same tests, though.

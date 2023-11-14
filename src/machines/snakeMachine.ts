@@ -48,9 +48,9 @@ const getInitialContext = () => {
    * forward and backward) through them in a fixed order, but each setting has
    * its own key/val pairs.
    *
-   * This wrinkles initial value extraction, ex.
-   * `settings.get("wall")?.settingValue!`, but simplifies
-   * cycling and event keying/lookup/updating.
+   * The trade-off: getting the value is a bit annoying (ex.
+   * `settings.get("wall")?.settingValue!`), but it it simplifies cycling
+   * through them, and event keying/lookup/updating.
    */
   const initialSettings = new Map();
   initialSettings.set("speed", {
