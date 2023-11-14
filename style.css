@@ -52,14 +52,14 @@ body {
   position: relative;
   display: none;
 }
-.touch-controls-container.touch-mobile,
+.touch-controls-container.touch-responsive,
 .touch-controls-container.touch-on {
   display: block;
   height: 20vh;
 }
 
 @media (min-width: 768px) {
-  .touch-controls-container.touch-mobile {
+  .touch-controls-container.touch-responsive {
     display: none;
   }
 }
@@ -98,7 +98,7 @@ body {
   /* border: 3px solid red !important; */
 }
 @media (min-width: 768px) {
-  .touch-mobile .content-middle-row {
+  .touch-responsive .content-middle-row {
     height: 86vh;
     /* border: 3px solid purple !important; */
   }
@@ -140,7 +140,7 @@ body {
   /* border: 3px solid blue !important; */
 }
 @media (min-width: 768px) {
-  .touch-mobile .bg-board {
+  .touch-responsive .bg-board {
     max-height: var(--content-middle-row-no-touch-max);
     /* border: 3px solid purple !important; */
   }
@@ -175,7 +175,7 @@ body {
   max-height: var(--content-middle-row-no-touch-max);
 }
 @media (min-width: 768px) {
-  .touch-mobile .board {
+  .touch-responsive .board {
     max-height: var(--content-middle-row-no-touch-max);
   }
 }
@@ -195,7 +195,7 @@ body {
   height: 100vh;
 }
 @media (min-width: 768px) {
-  .menu.main-content-container.touch-mobile,
+  .menu.main-content-container.touch-responsive,
   .menu.main-content-container.touch-off {
     height: 100vh;
   }
@@ -313,13 +313,13 @@ button {
 }
 @media (min-width: 768px) {
   .touch-off .marquee-messages-row .marquee-touch,
-  .touch-mobile .marquee-messages-row .marquee-touch {
+  .touch-responsive .marquee-messages-row .marquee-touch {
     display: none;
   }
 }
 @media (max-width: 767px) {
   .touch-on .marquee-messages-row .marquee-desktop,
-  .touch-mobile .marquee-messages-row .marquee-desktop {
+  .touch-responsive .marquee-messages-row .marquee-desktop {
     display: none;
   }
 }
@@ -384,13 +384,12 @@ button {
   background: var(--black);
   /* -webkit-tap-highlight-color: transparent; */
 }
-.hit-area-container.touch-mobile,
+.hit-area-container.touch-responsive,
 .hit-area-container.touch-on {
   display: flex;
 }
-/* 768 is coupled with App.tsx's `isMobile` */
 @media (min-width: 768px) {
-  .hit-area-container.touch-mobile {
+  .hit-area-container.touch-responsive {
     display: none;
   }
 }

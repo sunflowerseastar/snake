@@ -40,7 +40,7 @@ const getInitialContext = () => {
   const speed = localStorage.getItem("speed")
     ? parseInt(localStorage.getItem("speed")!)
     : FALLBACK_INTERVAL_MS;
-  const touch = localStorage.getItem("touch") || "mobile";
+  const touch = localStorage.getItem("touch") || "responsive";
   const wall = localStorage.getItem("wall") || "crash";
 
   const initialSnake: Coordinate[] = [randomCoord(boardWidth, boardHeight)];
@@ -88,7 +88,7 @@ const getInitialContext = () => {
   });
   initialSettings.set("touch", {
     type: "enum",
-    settingOptions: ["mobile", "off", "on"],
+    settingOptions: ["responsive", "off", "on"],
     settingValue: touch,
   });
 
