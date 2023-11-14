@@ -23,7 +23,7 @@ It is written with [[https://react.dev/][React 18]], [[https://stately.ai/docs/x
 | arrow       | ←    | ↓    | ↑  | →     |
 | hjkl        | h    | j    | k  | l     |
 
-*Mobile:* gamepad shows ~< 768~ viewport width when the *touch* setting is /responsive/, and shows for all sizes when the *touch* setting is /on/.
+*Mobile:* gamepad shows ~< 768~ viewport width when the *gamepad* setting is /responsive/, and shows for all sizes when the *gamepad* setting is /on/.
 
 ** Settings
 
@@ -31,7 +31,7 @@ It is written with [[https://react.dev/][React 18]], [[https://stately.ai/docs/x
 - *Board width & board height:* what you expect =)
 - *Overlap:* game over if the snake hits itself
 - *Wall:* game over if the snake hits a wall
-- *Touch:* whether or not to show the gamepad
+- *Gamepad:* whether or not to show the gamepad
 
 Settings persist via local storage. Board width & board height are calculated in order to adjust to the viewport width & height unless they have been customized.
 

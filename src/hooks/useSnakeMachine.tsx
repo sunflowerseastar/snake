@@ -40,7 +40,7 @@ type SnakeMachineReactContextType = {
     boardHeight: number;
     overlap: string;
     speed: number;
-    touch: string;
+    gamepad: string;
     wall: string;
   };
   send: (event: MyEvents) => void;
@@ -69,7 +69,8 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
   const overlap = xstate.context.settings.get("overlap")
     ?.settingValue as string;
   const speed = xstate.context.settings.get("speed")?.settingValue as number;
-  const touch = xstate.context.settings.get("touch")?.settingValue as string;
+  const gamepad = xstate.context.settings.get("gamepad")
+    ?.settingValue as string;
   const wall = xstate.context.settings.get("wall")?.settingValue as string;
 
   const { settings, settingsActiveIndex } = xstate.context;
@@ -87,7 +88,7 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
           boardHeight,
           overlap,
           speed,
-          touch,
+          gamepad,
           wall,
         },
         isMenuOpen: xstate.matches("menu open"),

@@ -29,7 +29,7 @@ export type Context = {
   lastDirectionMoved: Direction | undefined;
   marqueeMessages: {
     desktop: string[];
-    touch: string[];
+    gamepad: string[];
   };
   newHighScore: number;
   settings: Map<string, Setting>;

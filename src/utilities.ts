@@ -102,10 +102,10 @@ export const initSnake = (boardWidth: number, boardHeight: number) => {
 };
 
 export const generateInitialBoardHeight = (
-  touch: string,
+  gamepad: string,
   testWidth = 0
 ): number =>
-  (window.innerHeight < 768 && touch === "responsive") || touch === "on"
+  (window.innerHeight < 768 && gamepad === "responsive") || gamepad === "on"
     ? Math.ceil((testWidth > 0 ? testWidth : window.innerHeight) / 70)
     : Math.ceil((testWidth > 0 ? testWidth : window.innerHeight) / 55);
 

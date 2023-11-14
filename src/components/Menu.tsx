@@ -19,7 +19,7 @@ export const Menu = () => {
       activeSettingKey,
       boardWidth,
       boardHeight,
-      touch,
+      gamepad,
     },
     isMenuOpen,
     send,
@@ -55,7 +55,7 @@ export const Menu = () => {
           className={classNames(
             "menu",
             "main-content-container",
-            `touch-${touch}`
+            `gamepad-${gamepad}`
           )}
         >
           <div className="main-content-container-inner">
@@ -109,7 +109,7 @@ export const Menu = () => {
                   boardHeight={settingValue as number}
                 />
               )}
-              {activeSettingKey === "touch" && (
+              {activeSettingKey === "gamepad" && (
                 <BgBoard boardWidth={boardWidth} boardHeight={boardHeight} />
               )}
               {activeSettingKey === "overlap" && <OverlapDemonstrationBoard />}

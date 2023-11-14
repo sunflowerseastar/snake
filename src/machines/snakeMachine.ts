@@ -25,13 +25,13 @@ import { CRASHFLASH_INTERVAL_MS, FALLBACK_INTERVAL_MS } from "../constants";
 
 const getInitialContext = () => {
   console.log("getInitialContext()");
-  const touch = localStorage.getItem("touch") || "responsive";
+  const gamepad = localStorage.getItem("gamepad") || "responsive";
   const boardWidth = localStorage.getItem("board width")
     ? parseInt(localStorage.getItem("board width")!)
     : generateInitialBoardWidth();
   const boardHeight = localStorage.getItem("board height")
     ? parseInt(localStorage.getItem("board height")!)
-    : generateInitialBoardHeight(touch);
+    : generateInitialBoardHeight(gamepad);
   const highScore = localStorage.getItem("highScore")
     ? parseInt(localStorage.getItem("highScore")!)
     : 0;
@@ -84,10 +84,10 @@ const getInitialContext = () => {
     settingOptions: ["crash", "thru"],
     settingValue: overlap,
   });
-  initialSettings.set("touch", {
+  initialSettings.set("gamepad", {
     type: "enum",
     settingOptions: ["responsive", "off", "on"],
-    settingValue: touch,
+    settingValue: gamepad,
   });
 
   return {
@@ -96,7 +96,7 @@ const getInitialContext = () => {
     food: randomCoordThatAvoidsCoords(initialSnake, boardWidth, boardHeight),
     highScore,
     lastDirectionMoved: undefined,
-    marqueeMessages: { desktop: [""], touch: [""] },
+    marqueeMessages: { desktop: [""], gamepad: [""] },
     newHighScore: highScore,
     settings: initialSettings,
     settingsActiveIndex: 0,
@@ -126,7 +126,7 @@ export const snakeMachine = createMachine(
               crashflashCount: 0,
               marqueeMessages: {
                 desktop: ["ready", "^ _ < > move", "spc pause"],
-                touch: ["ready", "^ _ < > move", "tap board to pause"],
+                gamepad: ["ready", "^ _ < > move", "tap board to pause"],
               },
             }),
             on: {
@@ -162,7 +162,7 @@ export const snakeMachine = createMachine(
                           `new high: ${newHighScore}`,
                           "spc reset",
                         ],
-                        touch: [
+                        gamepad: [
                           "game over",
                           `new high: ${newHighScore}`,
                           "tap board to reset",
@@ -174,7 +174,7 @@ export const snakeMachine = createMachine(
                           "spc reset",
                           `high score: ${newHighScore}`,
                         ],
-                        touch: [
+                        gamepad: [
                           "game over",
                           "tap board to reset",
                           `high score: ${newHighScore}`,
@@ -217,7 +217,7 @@ export const snakeMachine = createMachine(
             states: {
               unpaused: {
                 entry: assign({
-                  marqueeMessages: { desktop: [""], touch: [""] },
+                  marqueeMessages: { desktop: [""], gamepad: [""] },
                 }),
                 after: [
                   {
@@ -259,7 +259,7 @@ export const snakeMachine = createMachine(
                 entry: assign({
                   marqueeMessages: {
                     desktop: ["paused", "spc unpause"],
-                    touch: ["paused", "spc unpause"],
+                    gamepad: ["paused", "spc unpause"],
                   },
                   food: ({ context: { food, settings, snake } }) => {
                     const boardWidth = settings.get("board width")

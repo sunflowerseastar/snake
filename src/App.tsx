@@ -23,7 +23,7 @@ const App = () => {
       newHighScore,
       overlap,
       snake,
-      touch,
+      gamepad,
     },
     isMenuOpen,
     send,
@@ -55,7 +55,7 @@ const App = () => {
   return (
     <>
       <Menu />
-      <div className={`main-content-container touch-${touch}`}>
+      <div className={`main-content-container gamepad-${gamepad}`}>
         <div className="main-content-container-inner">
           <div className="content-top-row">
             <Len9Text text={snake.length.toString()} />
@@ -89,12 +89,12 @@ const App = () => {
           </Board>
 
           <div
-            className={`content-bottom-row marquee-messages-row touch-${touch}`}
+            className={`content-bottom-row marquee-messages-row gamepad-${gamepad}`}
           >
             <Len9Marquee
-              cx={["marquee-touch"]}
-              key={marqueeMessages.touch.join("")}
-              marqueeMessages={marqueeMessages.touch}
+              cx={["marquee-gamepad"]}
+              key={marqueeMessages.gamepad.join("")}
+              marqueeMessages={marqueeMessages.gamepad}
             />
             <Len9Marquee
               cx={["marquee-desktop"]}
@@ -105,8 +105,8 @@ const App = () => {
         </div>
       </div>
 
-      <div className={`touch-controls-container touch-${touch}`}>
-        <div className={classNames("hit-area-container", `touch-${touch}`)}>
+      <div className={`gamepad-controls-container gamepad-${gamepad}`}>
+        <div className={classNames("hit-area-container", `gamepad-${gamepad}`)}>
           <div className="hit-area-row">
             <button
               onClick={() =>

@@ -26,7 +26,7 @@
   --square-edge-length-full: min(96vw, 86vh);
 
   --content-middle-row-height-max: max(100%, 66vh);
-  --content-middle-row-no-touch-max: max(100%, 86vh);
+  --content-middle-row-no-gamepad-max: max(100%, 86vh);
   --constraint-width: 96vw;
 }
 
@@ -48,18 +48,18 @@ body {
   display: flex;
   justify-content: space-around;
 }
-.touch-controls-container {
+.gamepad-controls-container {
   position: relative;
   display: none;
 }
-.touch-controls-container.touch-responsive,
-.touch-controls-container.touch-on {
+.gamepad-controls-container.gamepad-responsive,
+.gamepad-controls-container.gamepad-on {
   display: block;
   height: 20vh;
 }
 
 @media (min-width: 768px) {
-  .touch-controls-container.touch-responsive {
+  .gamepad-controls-container.gamepad-responsive {
     display: none;
   }
 }
@@ -93,12 +93,12 @@ body {
   height: 66vh;
   /* border: 3px solid blue !important; */
 }
-.touch-off .content-middle-row {
+.gamepad-off .content-middle-row {
   height: 86vh;
   /* border: 3px solid red !important; */
 }
 @media (min-width: 768px) {
-  .touch-responsive .content-middle-row {
+  .gamepad-responsive .content-middle-row {
     height: 86vh;
     /* border: 3px solid purple !important; */
   }
@@ -135,13 +135,13 @@ body {
   /* border: 3px solid red !important; */
   /* note gridTemplate & aspectRatio are controlled in Board.tsx */
 }
-.touch-off .bg-board {
-  max-height: var(--content-middle-row-no-touch-max);
+.gamepad-off .bg-board {
+  max-height: var(--content-middle-row-no-gamepad-max);
   /* border: 3px solid blue !important; */
 }
 @media (min-width: 768px) {
-  .touch-responsive .bg-board {
-    max-height: var(--content-middle-row-no-touch-max);
+  .gamepad-responsive .bg-board {
+    max-height: var(--content-middle-row-no-gamepad-max);
     /* border: 3px solid purple !important; */
   }
 }
@@ -171,12 +171,12 @@ body {
   /* note gridTemplate & aspectRatio are controlled in Board.tsx */
   /* border: 3px solid red !important; */
 }
-.touch-off .board {
-  max-height: var(--content-middle-row-no-touch-max);
+.gamepad-off .board {
+  max-height: var(--content-middle-row-no-gamepad-max);
 }
 @media (min-width: 768px) {
-  .touch-responsive .board {
-    max-height: var(--content-middle-row-no-touch-max);
+  .gamepad-responsive .board {
+    max-height: var(--content-middle-row-no-gamepad-max);
   }
 }
 
@@ -191,12 +191,12 @@ body {
   display: flex;
   z-index: 2;
 }
-.menu.main-content-container.touch-off {
+.menu.main-content-container.gamepad-off {
   height: 100vh;
 }
 @media (min-width: 768px) {
-  .menu.main-content-container.touch-responsive,
-  .menu.main-content-container.touch-off {
+  .menu.main-content-container.gamepad-responsive,
+  .menu.main-content-container.gamepad-off {
     height: 100vh;
   }
 }
@@ -305,21 +305,21 @@ button {
   display: grid;
   grid-auto-rows: 1fr;
 }
-.touch-on .marquee-messages-row .marquee-desktop {
+.gamepad-on .marquee-messages-row .marquee-desktop {
   display: none;
 }
-.touch-off .marquee-messages-row .marquee-touch {
+.gamepad-off .marquee-messages-row .marquee-gamepad {
   display: none;
 }
 @media (min-width: 768px) {
-  .touch-off .marquee-messages-row .marquee-touch,
-  .touch-responsive .marquee-messages-row .marquee-touch {
+  .gamepad-off .marquee-messages-row .marquee-gamepad,
+  .gamepad-responsive .marquee-messages-row .marquee-gamepad {
     display: none;
   }
 }
 @media (max-width: 767px) {
-  .touch-on .marquee-messages-row .marquee-desktop,
-  .touch-responsive .marquee-messages-row .marquee-desktop {
+  .gamepad-on .marquee-messages-row .marquee-desktop,
+  .gamepad-responsive .marquee-messages-row .marquee-desktop {
     display: none;
   }
 }
@@ -384,12 +384,12 @@ button {
   background: var(--black);
   /* -webkit-tap-highlight-color: transparent; */
 }
-.hit-area-container.touch-responsive,
-.hit-area-container.touch-on {
+.hit-area-container.gamepad-responsive,
+.hit-area-container.gamepad-on {
   display: flex;
 }
 @media (min-width: 768px) {
-  .hit-area-container.touch-responsive {
+  .hit-area-container.gamepad-responsive {
     display: none;
   }
 }
