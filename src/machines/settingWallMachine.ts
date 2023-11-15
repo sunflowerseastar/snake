@@ -59,22 +59,22 @@ export const settingWallMachine = createMachine(
         entry: assign({
           crashflashCount: 0,
         }),
-        after: [
-          {
-            delay: ({ context: { speed } }) => speed,
-            guard: "is wall-crash and hitting a wall",
-            target: "crashflash",
-          },
-          {
-            delay: ({ context: { speed } }) => speed,
-            actions: [
-              {
-                type: "move snake",
-              },
-            ],
-            target: ".",
-          },
-        ],
+        after: {
+          DELAY: [
+            {
+              guard: "is wall-crash and hitting a wall",
+              target: "crashflash",
+            },
+            {
+              actions: [
+                {
+                  type: "move snake",
+                },
+              ],
+              target: ".",
+            },
+          ],
+        },
         on: {
           "update wall": {
             actions: assign({
@@ -88,27 +88,27 @@ export const settingWallMachine = createMachine(
         },
       },
       crashflash: {
-        after: [
-          {
-            delay: CRASHFLASH_INTERVAL_MS,
-            // is not finished flashing
-            guard: ({ context: { crashflashCount } }) => crashflashCount < 6,
-            actions: assign({
-              crashflashCount: ({ context: { crashflashCount } }) =>
-                crashflashCount + 1,
-            }),
-            target: "crashflash",
-          },
-          {
-            delay: CRASHFLASH_INTERVAL_MS,
-            actions: assign({
-              snake: ({ context: { boardWidth, boardHeight } }) =>
-                initSnake(boardWidth, boardHeight),
-              direction: Direction.ArrowLeft,
-            }),
-            target: "unpaused",
-          },
-        ],
+        after: {
+          [CRASHFLASH_INTERVAL_MS]: [
+            {
+              // is not finished flashing
+              guard: ({ context: { crashflashCount } }) => crashflashCount < 6,
+              actions: assign({
+                crashflashCount: ({ context: { crashflashCount } }) =>
+                  crashflashCount + 1,
+              }),
+              target: "crashflash",
+            },
+            {
+              actions: assign({
+                snake: ({ context: { boardWidth, boardHeight } }) =>
+                  initSnake(boardWidth, boardHeight),
+                direction: Direction.ArrowLeft,
+              }),
+              target: "unpaused",
+            },
+          ],
+        },
         on: {
           "update wall": {
             actions: assign({
@@ -169,4 +169,8 @@ export const settingWallMachine = createMachine(
         ),
     },
   }
-);
+).provide({
+  delays: {
+    DELAY: ({ context: { speed } }) => speed,
+  },
+});

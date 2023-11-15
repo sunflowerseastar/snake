@@ -58,22 +58,18 @@ export const settingOverlapMachine = createMachine(
         entry: assign({
           crashflashCount: 0,
         }),
-        after: [
-          {
-            delay: ({ context: { speed } }) => speed,
-            guard: "is crashing by overlapping itself",
-            target: "crashflash",
-          },
-          {
-            delay: ({ context: { speed } }) => speed,
-            actions: [
-              {
-                type: "move snake",
-              },
-            ],
-            target: ".",
-          },
-        ],
+        after: {
+          DELAY: [
+            {
+              guard: "is crashing by overlapping itself",
+              target: "crashflash",
+            },
+            {
+              guard: "is crashing by overlapping itself",
+              target: "crashflash",
+            },
+          ],
+        },
         on: {
           "update overlap": {
             actions: assign({
@@ -86,29 +82,28 @@ export const settingOverlapMachine = createMachine(
           },
         },
       },
-      // TODO fix crashflash (maybe css??)
       crashflash: {
-        after: [
-          {
-            delay: CRASHFLASH_INTERVAL_MS,
-            // is not finished flashing
-            guard: ({ context: { crashflashCount } }) => crashflashCount < 6,
-            actions: assign({
-              crashflashCount: ({ context: { crashflashCount } }) =>
-                crashflashCount + 1,
-            }),
-            target: "crashflash",
-          },
-          {
-            delay: CRASHFLASH_INTERVAL_MS,
-            actions: assign({
-              snake: ({ context: { boardWidth, boardHeight } }) =>
-                initSnake(boardWidth, boardHeight),
-              direction: Direction.ArrowLeft,
-            }),
-            target: "unpaused",
-          },
-        ],
+        after: {
+          [CRASHFLASH_INTERVAL_MS]: [
+            {
+              // is not finished flashing
+              guard: ({ context: { crashflashCount } }) => crashflashCount < 6,
+              actions: assign({
+                crashflashCount: ({ context: { crashflashCount } }) =>
+                  crashflashCount + 1,
+              }),
+              target: "crashflash",
+            },
+            {
+              actions: assign({
+                snake: ({ context: { boardWidth, boardHeight } }) =>
+                  initSnake(boardWidth, boardHeight),
+                direction: Direction.ArrowLeft,
+              }),
+              target: "unpaused",
+            },
+          ],
+        },
         on: {
           "update overlap": {
             actions: assign({
@@ -172,4 +167,8 @@ export const settingOverlapMachine = createMachine(
         ),
     },
   }
-);
+).provide({
+  delays: {
+    DELAY: ({ context: { speed } }) => speed,
+  },
+});

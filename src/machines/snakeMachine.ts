@@ -183,9 +183,8 @@ export const snakeMachine = createMachine(
                 newHighScore,
               };
             }),
-            after: [
-              {
-                delay: CRASHFLASH_INTERVAL_MS,
+            after: {
+              [CRASHFLASH_INTERVAL_MS]: {
                 // is not finished flashing
                 guard: ({ context: { crashflashCount } }) =>
                   crashflashCount < 6,
@@ -195,7 +194,7 @@ export const snakeMachine = createMachine(
                 }),
                 target: "gameover",
               },
-            ],
+            },
             on: {
               spacebar: {
                 actions: assign(({ context: { newHighScore } }) => ({
@@ -219,26 +218,22 @@ export const snakeMachine = createMachine(
                 entry: assign({
                   marqueeMessages: { desktop: [""], gamepad: [""] },
                 }),
-                after: [
-                  {
-                    delay: ({ context: { settings } }) =>
-                      settings.get("speed")?.settingValue ||
-                      FALLBACK_INTERVAL_MS,
-                    guard: "is game over",
-                    target: "#Snake.menu closed.gameover",
-                  },
-                  {
-                    delay: ({ context: { settings } }) =>
-                      settings.get("speed")?.settingValue ||
-                      FALLBACK_INTERVAL_MS,
-                    actions: [
-                      {
-                        type: "move snake",
-                      },
-                    ],
-                    target: ".",
-                  },
-                ],
+                after: {
+                  DELAY: [
+                    {
+                      guard: "is game over",
+                      target: "#Snake.menu closed.gameover",
+                    },
+                    {
+                      actions: [
+                        {
+                          type: "move snake",
+                        },
+                      ],
+                      target: ".",
+                    },
+                  ],
+                },
                 on: {
                   spacebar: {
                     target: "paused",
@@ -466,4 +461,19 @@ export const snakeMachine = createMachine(
     },
     delays: { INTERVAL: FALLBACK_INTERVAL_MS },
   }
-);
+).provide({
+  delays: {
+    // DELAY: 1000, // or expression
+    // DELAY: ({ context: { speed } }) => speed,
+    // TODO use this one
+    // DELAY: ({ context: { settings } }) => {
+    //   const speed = settings.get("speed")?.settingValue as string;
+    //   return speed ? parseInt(speed) : FALLBACK_INTERVAL_MS;
+    // },
+    DELAY: ({ context: { settings } }) =>
+      parseInt(settings.get("speed")?.settingValue as string) ||
+      FALLBACK_INTERVAL_MS,
+    // DELAY: ({ context: { settings } }) => settings.get("speed")?.settingValue ?? FALLBACK_INTERVAL_MS,
+    // DELAY: () => FALLBACK_INTERVAL_MS,
+  },
+});

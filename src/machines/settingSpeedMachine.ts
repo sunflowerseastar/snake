@@ -47,9 +47,8 @@ export const settingSpeedMachine = createMachine(
     initial: "unpaused",
     states: {
       unpaused: {
-        after: [
-          {
-            delay: ({ context: { speed } }) => speed,
+        after: {
+          DELAY: {
             actions: [
               {
                 type: "move snake",
@@ -57,7 +56,17 @@ export const settingSpeedMachine = createMachine(
             ],
             target: ".",
           },
-        ],
+          // delay: ({ context: { speed } }) => speed,
+          // delay: ({ context }) => {
+          //   return context.speed;
+          // },
+          // actions: [
+          //   {
+          //     type: "move snake",
+          //   },
+          // ],
+          // target: ".",
+        },
         on: {
           "update speed": {
             actions: assign({
@@ -87,4 +96,9 @@ export const settingSpeedMachine = createMachine(
       }),
     },
   }
-);
+).provide({
+  delays: {
+    // DELAY: 1000, // or expression
+    DELAY: ({ context: { speed } }) => speed,
+  },
+});
