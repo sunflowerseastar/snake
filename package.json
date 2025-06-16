@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "build-storybook": "storybook build",
-    "dev": "bunx vite",
+    "dev": "vite",
     "prettier:check": "prettier --check '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "prettier:write": "prettier --write '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "serve": "vite preview",

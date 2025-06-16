@@ -3,11 +3,10 @@
 This is a web version of the classic snake game.
 
 #+begin_src sh
-bun i
-yarn dev          # vite, localhost:5173
-yarn build
-yarn test         # to use vitest
-bun test --watch  # to use bun test
+pnpm install  # install dependencies
+pnpm dev      # vite, localhost:5173
+pnpm build    # bundle in dist/
+pnpm test     # vitest
 #+end_src
 
 It is written with [[https://react.dev/][React 18]], [[https://stately.ai/docs/xstate][XState 5]], and [[https://github.com/thi-ng/umbrella/tree/develop/packages/transducers][thi.ng/transducers]].
@@ -43,17 +42,17 @@ Like Settings, High Score persists via local storage.
 
 ** Build
 
-Run ~bun build~ to build with [[https://vitejs.dev/][Vite]].
+Run ~pnpm build~ to build with [[https://vitejs.dev/][Vite]].
 
 ** Dependencies
 
 | dependency         | purpose                             |
 |--------------------+-------------------------------------|
-| [[https://bun.sh/][Bun]]                | packages, testing                   |
+| [[https://pnpm.io/][pnpm]]               | packages                            |
 | [[https://vitejs.dev/][Vite]]               | bundling, local dev, build, testing |
 | [[https://react.dev/][React]]              | frontend library/architecture       |
 | [[https://stately.ai/docs/xstate][XState]]             | state management                    |
-| [[https://github.com/thi-ng/umbrella/tree/develop/packages/transducers][thi.ng/transducers]] | have fun with FP                    |
+| [[https://github.com/thi-ng/umbrella/tree/develop/packages/transducers][thi.ng/transducers]] | fun with FP                         |
 | [[https://github.com/JedWatson/classnames][classnames]]         | help with vanilla css               |
 
 ** Site Structure
@@ -84,4 +83,4 @@ This XState context plugs into the React app via a React [[https://react.dev/ref
 
 ** Test
 
-Run unit tests with ~yarn test~ for [[https://vitest.dev/][Vitest]] or ~bun test --watch~ for [[https://bun.sh/docs/cli/test][bun test]]. Same tests, though.
+Run unit tests with ~pnpm test~ for [[https://vitest.dev/][Vitest]].
