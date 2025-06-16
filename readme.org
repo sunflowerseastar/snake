@@ -9,7 +9,7 @@ pnpm build    # bundle in dist/
 pnpm test     # vitest
 #+end_src
 
-It is written with [[https://react.dev/][React 18]], [[https://stately.ai/docs/xstate][XState 5]], and [[https://github.com/thi-ng/umbrella/tree/develop/packages/transducers][thi.ng/transducers]].
+It is written with [[https://react.dev/][React 19]], [[https://stately.ai/docs/xstate][XState 5]], and [[https://github.com/thi-ng/umbrella/tree/develop/packages/transducers][thi.ng/transducers]].
 
 * Game Play
 
@@ -81,6 +81,10 @@ This XState context plugs into the React app via a React [[https://react.dev/ref
 | XState States  | a model of the app in terms of statechart states                    |
 | React Context  | an arbitrary collection of app state that can reach all descendants |
 | React Provider | a given React context's root component                              |
+
+Here is the statechart:
+
+[[./statechart.png]]
 
 ** Test
 
