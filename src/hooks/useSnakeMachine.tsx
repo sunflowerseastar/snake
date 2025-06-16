@@ -42,6 +42,7 @@ type SnakeMachineReactContextType = {
     speed: number;
     gamepad: string;
     wall: string;
+    theme: string;
   };
   send: (event: MyEvents) => void;
 };
@@ -72,6 +73,7 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
   const gamepad = xstate.context.settings.get("gamepad")
     ?.settingValue as string;
   const wall = xstate.context.settings.get("wall")?.settingValue as string;
+  const theme = xstate.context.settings.get("theme")?.settingValue as string;
 
   const { settings, settingsActiveIndex } = xstate.context;
   const activeSettingKey = getActiveSettingKey(settings, settingsActiveIndex);
@@ -90,6 +92,7 @@ export const SnakeMachineProvider: React.FC<SnakeMachineProviderProps> = ({
           speed,
           gamepad,
           wall,
+          theme,
         },
         isMenuOpen: xstate.matches("menu open"),
         send,

@@ -17,6 +17,24 @@
   --light-gray: #f1f1f1;
   --white: #fff;
 
+  /* Theme colors */
+  --bg-color: var(--white);
+  --text-color: var(--black);
+  --square-snake-color: var(--dark-gray);
+  --square-food-color: var(--red);
+  --button-bg-color: var(--black);
+  --button-text-color: var(--white);
+  --button-hover-bg: var(--black);
+  --button-hover-text: var(--white);
+  --button-active-bg: var(--blue);
+  --button-active-text: var(--white);
+  --board-bg-light: var(--light-gray);
+  --board-bg-white: var(--white);
+  --menu-bg: var(--white);
+  --accent-color: var(--blue);
+  --block-color: var(--black);
+  --button-border-color: var(--black);
+
   --space-xs: 0.36em;
   --space-sm: 0.6em;
   --space-md: 1.8em;
@@ -28,6 +46,26 @@
   --content-middle-row-height-max: max(100%, 66vh);
   --content-middle-row-no-gamepad-max: max(100%, 86vh);
   --constraint-width: 96vw;
+}
+
+/* Dark theme */
+:root.dark-theme {
+  --bg-color: var(--dark-gray);
+  --text-color: var(--lavender);
+  --square-snake-color: var(--lavender);
+  --square-food-color: #ff6b6b;
+  --button-bg-color: var(--lavender);
+  --button-text-color: var(--dark-gray);
+  --button-hover-bg: #ddd;
+  --button-hover-text: var(--dark-gray);
+  --button-active-bg: var(--lavender);
+  --button-active-text: var(--dark-gray);
+  --board-bg-light: #3a3837;
+  --board-bg-white: var(--dark-gray);
+  --menu-bg: var(--dark-gray);
+  --accent-color: var(--lavender);
+  --block-color: #ddd;
+  --button-border-color: #ddd;
 }
 
 body {
@@ -72,7 +110,7 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 1;
-  background: var(--white);
+  background: var(--bg-color);
 }
 .content-top-row {
   flex-shrink: 0;
@@ -151,10 +189,10 @@ body {
 .bg-square-dark {
   background: repeating-linear-gradient(
     -45deg,
-    var(--light-gray),
-    var(--light-gray) 2px,
-    var(--white) 2px,
-    var(--white) 4px
+    var(--board-bg-light),
+    var(--board-bg-light) 2px,
+    var(--board-bg-white) 2px,
+    var(--board-bg-white) 4px
   );
 }
 .board {
@@ -187,7 +225,7 @@ body {
   position: absolute;
   width: 100vw;
   height: 80vh;
-  background: var(--white);
+  background: var(--menu-bg);
   display: flex;
   z-index: 2;
 }
@@ -218,11 +256,11 @@ body {
   aspect-ratio: 1 / 1;
 }
 .square.snake {
-  background: var(--dark-gray);
+  background: var(--square-snake-color);
   z-index: 1;
 }
 .square.food {
-  background: var(--red);
+  background: var(--square-food-color);
   z-index: 1;
 }
 .square.flash {
@@ -266,36 +304,36 @@ button {
   background: var(--medium-gray-2);
 }
 .button-navigate .len-9-chars-grid .block-1 {
-  background: var(--black);
+  background: var(--block-color);
 }
 .button-navigate:hover .len-9-chars-grid .block-1 {
   background: var(--medium-gray-3);
 }
 .button-update-setting {
   padding: min(1vw, 1vh);
-  border: min(1vw, 1vh) solid var(--black);
+  border: min(1vw, 1vh) solid var(--button-border-color);
 }
 .button-update-setting + .button-update-setting {
   margin-left: 2vw;
 }
 .button-update-setting.isActive {
-  border: min(1vw, 1vh) solid var(--blue);
-  background: var(--blue) !important;
+  border: min(1vw, 1vh) solid var(--accent-color);
+  background: var(--button-active-bg) !important;
 }
 .button-update-setting.isActive .len-9-chars-grid .block-1 {
-  background: var(--white);
+  background: var(--button-active-text);
 }
 .button-update-setting.isActive:hover {
   cursor: default;
 }
 .button-update-setting:hover {
-  background: var(--black);
+  background: var(--button-hover-bg);
 }
 .button-update-setting .len-9-chars-grid .block-1 {
-  background: var(--black);
+  background: var(--block-color);
 }
 .button-update-setting:hover .len-9-chars-grid .block-1 {
-  background: var(--white);
+  background: var(--button-hover-text);
 }
 
 /*
@@ -353,13 +391,13 @@ button {
   grid-column: 1 / 1;
 }
 .block-1 {
-  background: var(--black);
+  background: var(--block-color);
 }
 .active-setting .block-1 {
-  background: var(--black);
+  background: var(--block-color);
 }
 .active-setting-value .block-1 {
-  background: var(--blue);
+  background: var(--accent-color);
 }
 .high-score .block-1 {
   background: var(--light-gray);

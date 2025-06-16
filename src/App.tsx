@@ -24,6 +24,7 @@ const App = () => {
       overlap,
       snake,
       gamepad,
+      theme,
     },
     isMenuOpen,
     send,
@@ -51,6 +52,15 @@ const App = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [send]);
+
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (theme === "dark") {
+      htmlElement.classList.add("dark-theme");
+    } else {
+      htmlElement.classList.remove("dark-theme");
+    }
+  }, [theme]);
 
   return (
     <>

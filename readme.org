@@ -31,6 +31,7 @@ It is written with [[https://react.dev/][React 18]], [[https://stately.ai/docs/x
 - *Overlap:* game over if the snake hits itself
 - *Wall:* game over if the snake hits a wall
 - *Gamepad:* whether or not to show the gamepad
+- *Theme:* light or dark mode
 
 Settings persist via local storage. Board width & board height are calculated in order to adjust to the viewport width & height unless they have been customized.
 

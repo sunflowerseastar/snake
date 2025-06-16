@@ -40,6 +40,7 @@ const getInitialContext = () => {
     ? parseInt(localStorage.getItem("speed")!)
     : FALLBACK_INTERVAL_MS;
   const wall = localStorage.getItem("wall") || "crash";
+  const theme = localStorage.getItem("theme") || "dark";
 
   const initialSnake: Coordinate[] = [randomCoord(boardWidth, boardHeight)];
 
@@ -88,6 +89,11 @@ const getInitialContext = () => {
     type: "enum",
     settingOptions: ["responsive", "off", "on"],
     settingValue: gamepad,
+  });
+  initialSettings.set("theme", {
+    type: "enum",
+    settingOptions: ["light", "dark"],
+    settingValue: theme,
   });
 
   return {
@@ -461,7 +467,7 @@ export const snakeMachine = createMachine(
         );
       },
     },
-    delays: { INTERVAL: FALLBACK_INTERVAL_MS },
+    delays: { DELAY: FALLBACK_INTERVAL_MS },
   },
 ).provide({
   delays: {
@@ -472,7 +478,7 @@ export const snakeMachine = createMachine(
     //   const speed = settings.get("speed")?.settingValue as string;
     //   return speed ? parseInt(speed) : FALLBACK_INTERVAL_MS;
     // },
-    DELAY: ({ context: { settings } }) =>
+    DELAY: ({ context: { settings } }: { context: Context }) =>
       parseInt(settings.get("speed")?.settingValue as string) ||
       FALLBACK_INTERVAL_MS,
     // DELAY: ({ context: { settings } }) => settings.get("speed")?.settingValue ?? FALLBACK_INTERVAL_MS,
