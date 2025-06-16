@@ -55,7 +55,7 @@ export const Menu = () => {
           className={classNames(
             "menu",
             "main-content-container",
-            `gamepad-${gamepad}`
+            `gamepad-${gamepad}`,
           )}
         >
           <div className="main-content-container-inner">

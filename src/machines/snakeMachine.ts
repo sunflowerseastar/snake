@@ -193,6 +193,7 @@ export const snakeMachine = createMachine(
                     crashflashCount + 1,
                 }),
                 target: "gameover",
+                reenter: true,
               },
             },
             on: {
@@ -231,6 +232,7 @@ export const snakeMachine = createMachine(
                         },
                       ],
                       target: ".",
+                      reenter: true,
                     },
                   ],
                 },
@@ -265,7 +267,7 @@ export const snakeMachine = createMachine(
                       ? randomCoordThatAvoidsCoords(
                           snake,
                           boardWidth,
-                          boardHeight
+                          boardHeight,
                         )
                       : food;
                   },
@@ -350,7 +352,7 @@ export const snakeMachine = createMachine(
                   snake[0],
                   direction,
                   boardWidth,
-                  boardHeight
+                  boardHeight,
                 );
 
           const isEatingFood = newHead.x === food.x && newHead.y === food.y;
@@ -368,7 +370,7 @@ export const snakeMachine = createMachine(
             lastDirectionMoved: direction,
             snake: newSnake,
           };
-        }
+        },
       ),
       "increase/decrease": assign({
         settings: ({ context: { settings }, event }) => {
@@ -411,8 +413,8 @@ export const snakeMachine = createMachine(
           return cycleDirection === "forward"
             ? (settingsActiveIndex + 1) % settings.size
             : settingsActiveIndex === 0
-            ? settings.size - 1
-            : settingsActiveIndex - 1;
+              ? settings.size - 1
+              : settingsActiveIndex - 1;
         },
       }),
     },
@@ -425,7 +427,7 @@ export const snakeMachine = createMachine(
         return isLegalDirectionChange(
           arrowDirection,
           lastDirectionMoved,
-          snake
+          snake,
         );
       },
       "is game over": ({ context: { direction, settings, snake } }) => {
@@ -448,7 +450,7 @@ export const snakeMachine = createMachine(
                 head,
                 direction,
                 boardWidth,
-                boardHeight
+                boardHeight,
               );
 
         const isHittingWall = !isInBounds(newHead, boardWidth, boardHeight);
@@ -460,7 +462,7 @@ export const snakeMachine = createMachine(
       },
     },
     delays: { INTERVAL: FALLBACK_INTERVAL_MS },
-  }
+  },
 ).provide({
   delays: {
     // DELAY: 1000, // or expression

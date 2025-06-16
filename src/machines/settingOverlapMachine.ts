@@ -65,8 +65,9 @@ export const settingOverlapMachine = createMachine(
               target: "crashflash",
             },
             {
-              guard: "is crashing by overlapping itself",
-              target: "crashflash",
+              actions: [{ type: "move snake" }],
+              target: ".",
+              reenter: true,
             },
           ],
         },
@@ -93,6 +94,7 @@ export const settingOverlapMachine = createMachine(
                   crashflashCount + 1,
               }),
               target: "crashflash",
+              reenter: true,
             },
             {
               actions: assign({
@@ -134,7 +136,7 @@ export const settingOverlapMachine = createMachine(
             snake[0],
             direction,
             boardWidth,
-            boardHeight
+            boardHeight,
           );
 
           const isChangingDirection = Math.random() > 0.7;
@@ -148,7 +150,7 @@ export const settingOverlapMachine = createMachine(
               : numMovesWithoutTurning + 1,
             snake: [newHead, ...snake.slice(0, -1)],
           };
-        }
+        },
       ),
     },
     guards: {
@@ -161,12 +163,12 @@ export const settingOverlapMachine = createMachine(
             snake[0],
             direction,
             boardWidth,
-            boardHeight
+            boardHeight,
           ),
-          snake
+          snake,
         ),
     },
-  }
+  },
 ).provide({
   delays: {
     DELAY: ({ context: { speed } }) => speed,

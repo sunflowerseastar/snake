@@ -25,7 +25,7 @@ import { snakeMachine } from "../machines/snakeMachine";
 
 const getActiveSettingKey = (
   settings: Map<string, Setting>,
-  settingsActiveIndex: number
+  settingsActiveIndex: number,
 ): string => {
   const keys = Array.from(settings.keys());
   return keys[settingsActiveIndex];
@@ -104,7 +104,7 @@ export function useSnakeMachine() {
   const reactContext = useReactContext(SnakeMachineReactContext);
   if (reactContext === undefined) {
     throw new Error(
-      "useSnakeMachine must be used within a SnakeMachineProvider"
+      "useSnakeMachine must be used within a SnakeMachineProvider",
     );
   }
   return reactContext;

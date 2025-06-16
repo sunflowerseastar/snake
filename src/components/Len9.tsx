@@ -125,7 +125,7 @@ export const len9 = (str: string) =>
         [...bottomRow, ...len9Char.slice(third * 2, len)],
       ];
     },
-    [[], [], []] as number[][]
+    [[], [], []] as number[][],
   );
 
 const padWithZeros =
@@ -134,18 +134,18 @@ const padWithZeros =
     len9.map((len9CharRow: number[]) =>
       isRightAligned
         ? [...concat(repeat(0, gridWidth - len9CharRow.length), len9CharRow)]
-        : [...concat(len9CharRow, repeat(0, gridWidth - len9CharRow.length))]
+        : [...concat(len9CharRow, repeat(0, gridWidth - len9CharRow.length))],
     );
 
 export const convertToLen9AndAddPadding = (
   marqueeMessages: string[],
   gridWidth: number = 0,
-  isRightAligned: boolean = false
+  isRightAligned: boolean = false,
 ): number[][][] =>
   transduce(
     comp(map(len9), map(padWithZeros(gridWidth, isRightAligned))),
     push(),
-    marqueeMessages
+    marqueeMessages,
   );
 
 type Len9DisplayComponentProps = {
@@ -217,7 +217,7 @@ export const Len9Text: React.FC<Len9TextProps> = ({
   const len9CharsReadyForDisplay: number[][] = convertToLen9AndAddPadding(
     [text],
     gridWidth,
-    isRightAligned
+    isRightAligned,
   ).flat();
 
   return (
@@ -256,12 +256,12 @@ export const Len9Text: React.FC<Len9TextProps> = ({
  */
 export const combineArrays = (
   len9a: number[][],
-  len9b: number[][]
+  len9b: number[][],
 ): Iterable<number[]> =>
   transduce(
     map((arrs: [number[], number[]]) => [...concat(...arrs)]),
     push(),
-    zip(len9a, len9b)
+    zip(len9a, len9b),
   );
 
 /*
@@ -284,10 +284,10 @@ export const combineArrays = (
  */
 export const sliceSubArraysAndCat = (
   currScrollPosition: number,
-  gridWidth: number
+  gridWidth: number,
 ) =>
   map((arr: number[]) =>
-    arr.slice(currScrollPosition, currScrollPosition + gridWidth)
+    arr.slice(currScrollPosition, currScrollPosition + gridWidth),
   );
 
 type Len9MarqueeProps = {
@@ -365,7 +365,7 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
 
   const len9sPadded = useMemo(
     () => convertToLen9AndAddPadding(marqueeMessages, gridWidth),
-    [marqueeMessages, gridWidth]
+    [marqueeMessages, gridWidth],
   );
 
   /*
@@ -379,15 +379,15 @@ export const Len9Marquee: React.FC<Len9MarqueeProps> = ({
     () =>
       combineArrays(
         len9sPadded[activeTextIndex % marqueeMessages.length],
-        len9sPadded[(activeTextIndex + 1) % marqueeMessages.length]
+        len9sPadded[(activeTextIndex + 1) % marqueeMessages.length],
       ),
-    [len9sPadded, activeTextIndex, marqueeMessages]
+    [len9sPadded, activeTextIndex, marqueeMessages],
   );
 
   const len9SlicedCharsReadyForDisplay = [
     ...iterator(
       sliceSubArraysAndCat(currScrollPosition, gridWidth),
-      len9CharsCombined
+      len9CharsCombined,
     ),
   ];
 

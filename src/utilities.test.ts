@@ -18,7 +18,7 @@ test("a coordinate is/is-not contained in an array of coordinates", () => {
     isCoordInCoords({ x: 0, y: 0 }, [
       { x: 1, y: 0 },
       { x: 0, y: 0 },
-    ])
+    ]),
   ).toEqual(true);
   expect(isCoordInCoords({ x: 0, y: 0 }, [{ x: 1, y: 0 }])).toEqual(false);
   expect(isCoordInCoords({ x: 0, y: 0 }, [])).toEqual(false);
@@ -37,7 +37,7 @@ test("legal direction changes", () => {
         y: 1,
       },
       { x: 1, y: 1 },
-    ])
+    ]),
   ).toEqual(false);
   expect(
     isLegalDirectionChange(Direction.ArrowUp, Direction.ArrowRight, [
@@ -46,7 +46,7 @@ test("legal direction changes", () => {
         y: 1,
       },
       { x: 1, y: 1 },
-    ])
+    ]),
   ).toEqual(true);
 });
 test("board size generation", () => {

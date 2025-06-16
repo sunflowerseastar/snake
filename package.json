@@ -1,19 +1,19 @@
 {
   "name": "snake",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "snake in react & xstate",
   "scripts": {
     "build": "tsc && vite build",
-    "build-storybook": "storybook build",
     "dev": "vite",
     "prettier:check": "prettier --check '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "prettier:write": "prettier --write '**/*.{ts,tsx,js,jsx,css,md,json}'",
     "serve": "vite preview",
-    "storybook": "storybook dev -p 6006",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+    "pre-commit": "npx lint-staged && pnpm typecheck",
+    "pre-push": "pnpm typecheck"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,css,md,json}": [
@@ -21,36 +21,24 @@
     ]
   },
   "dependencies": {
-    "@thi.ng/transducers": "^8.7.1",
-    "@xstate/react": "beta",
-    "classnames": "^2.3.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "xstate": "beta"
+    "@thi.ng/transducers": "^9.4.1",
+    "@xstate/react": "^5.0.5",
+    "classnames": "^2.5.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "xstate": "^5.19.4"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^7.4.0",
-    "@storybook/addon-interactions": "^7.4.0",
-    "@storybook/addon-links": "^7.4.0",
-    "@storybook/addon-onboarding": "^1.0.8",
-    "@storybook/blocks": "^7.4.0",
-    "@storybook/react": "^7.4.0",
-    "@storybook/react-vite": "^7.4.0",
-    "@storybook/testing-library": "^0.2.0",
-    "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
-    "@typescript-eslint/parser": "^5.8.1",
-    "@vitejs/plugin-react": "^4.0.4",
-    "eslint": "^8.5.0",
-    "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-storybook": "^0.6.13",
-    "jsdom": "^22.1.0",
-    "lint-staged": "^15.1.0",
-    "simple-git-hooks": "^2.9.0",
-    "storybook": "^7.4.0",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.0",
-    "vitest": "^0.34.6"
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "jsdom": "^26.1.0",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.5.3",
+    "simple-git-hooks": "^2.13.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.3"
   },
   "eslintConfig": {
     "extends": [

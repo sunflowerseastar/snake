@@ -72,6 +72,7 @@ export const settingWallMachine = createMachine(
                 },
               ],
               target: ".",
+              reenter: true,
             },
           ],
         },
@@ -98,6 +99,7 @@ export const settingWallMachine = createMachine(
                   crashflashCount + 1,
               }),
               target: "crashflash",
+              reenter: true,
             },
             {
               actions: assign({
@@ -149,12 +151,12 @@ export const settingWallMachine = createMachine(
                 snake[0],
                 direction,
                 boardWidth,
-                boardHeight
+                boardHeight,
               ),
               ...snake.slice(0, -1),
             ],
           };
-        }
+        },
       ),
     },
     guards: {
@@ -165,10 +167,10 @@ export const settingWallMachine = createMachine(
         !isInBounds(
           getNewHeadPosition(snake[0], direction),
           boardWidth,
-          boardHeight
+          boardHeight,
         ),
     },
-  }
+  },
 ).provide({
   delays: {
     DELAY: ({ context: { speed } }) => speed,

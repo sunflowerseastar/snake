@@ -22,7 +22,7 @@ const Square = ({
               snake: !isFood,
               square: true,
             },
-            ...cx
+            ...cx,
           )
         : classNames({
             food: isFood,

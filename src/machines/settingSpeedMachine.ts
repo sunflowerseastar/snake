@@ -55,6 +55,7 @@ export const settingSpeedMachine = createMachine(
               },
             ],
             target: ".",
+            reenter: true,
           },
           // delay: ({ context: { speed } }) => speed,
           // delay: ({ context }) => {
@@ -89,13 +90,13 @@ export const settingSpeedMachine = createMachine(
             snake[0],
             direction,
             boardWidth,
-            boardHeight
+            boardHeight,
           ),
           ...snake.slice(0, -1),
         ],
       }),
     },
-  }
+  },
 ).provide({
   delays: {
     // DELAY: 1000, // or expression

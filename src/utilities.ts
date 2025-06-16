@@ -3,29 +3,29 @@ import { Coordinate, Direction } from "./types";
 export const isInBounds = (
   coord: Coordinate,
   boardWidth: number,
-  boardHeight: number
+  boardHeight: number,
 ): boolean =>
   coord.x >= 0 && coord.y >= 0 && coord.x < boardWidth && coord.y < boardHeight;
 
 export const isCoordInCoords = (
   coord: Coordinate,
-  coords: Coordinate[]
+  coords: Coordinate[],
 ): boolean => coords.some(({ x, y }) => x === coord.x && y === coord.y);
 
 export const opposite = (d: Direction) =>
   d === "ArrowUp"
     ? "ArrowDown"
     : d === "ArrowDown"
-    ? "ArrowUp"
-    : d === "ArrowLeft"
-    ? "ArrowRight"
-    : "ArrowLeft";
+      ? "ArrowUp"
+      : d === "ArrowLeft"
+        ? "ArrowRight"
+        : "ArrowLeft";
 
 export const randomInt = (n: number) => Math.floor(Math.random() * n);
 
 export const randomCoord = (
   boardWidth: number,
-  boardHeight: number
+  boardHeight: number,
 ): Coordinate => ({
   x: randomInt(boardWidth),
   y: randomInt(boardHeight),
@@ -34,7 +34,7 @@ export const randomCoord = (
 export const randomCoordThatAvoidsCoords = (
   coordsToAvoid: Coordinate[],
   boardWidth: number,
-  boardHeight: number
+  boardHeight: number,
 ): Coordinate => {
   const possibleCoord = randomCoord(boardWidth, boardHeight);
   return isCoordInCoords(possibleCoord, coordsToAvoid)
@@ -45,7 +45,7 @@ export const randomCoordThatAvoidsCoords = (
 export const isLegalDirectionChange = (
   newDirection: Direction,
   previousDirection: Direction | undefined,
-  snake: Coordinate[]
+  snake: Coordinate[],
 ): boolean =>
   !(
     snake.length > 1 &&
@@ -58,7 +58,7 @@ export const randomDirection = () =>
 
 export const newRandomDirection = (
   previousDirection: Direction | undefined,
-  snake: Coordinate[]
+  snake: Coordinate[],
 ): Direction => {
   const possibleNewDirection = randomDirection();
   return isLegalDirectionChange(possibleNewDirection, previousDirection, snake)
@@ -68,29 +68,29 @@ export const newRandomDirection = (
 
 export const getNewHeadPosition = (
   head: Coordinate,
-  direction: Direction
+  direction: Direction,
 ): Coordinate =>
   direction === "ArrowUp"
     ? { x: head.x, y: head.y - 1 }
     : direction === "ArrowDown"
-    ? { x: head.x, y: head.y + 1 }
-    : direction === "ArrowLeft"
-    ? { x: head.x - 1, y: head.y }
-    : { x: head.x + 1, y: head.y };
+      ? { x: head.x, y: head.y + 1 }
+      : direction === "ArrowLeft"
+        ? { x: head.x - 1, y: head.y }
+        : { x: head.x + 1, y: head.y };
 
 export const getNewHeadPositionWithWrap = (
   head: Coordinate,
   direction: Direction,
   boardWidth: number,
-  boardHeight: number
+  boardHeight: number,
 ): Coordinate =>
   direction === "ArrowUp"
     ? { x: head.x, y: head.y - 1 < 0 ? boardHeight - 1 : head.y - 1 }
     : direction === "ArrowDown"
-    ? { x: head.x, y: head.y + 1 >= boardHeight ? 0 : head.y + 1 }
-    : direction === "ArrowLeft"
-    ? { x: head.x - 1 < 0 ? boardWidth - 1 : head.x - 1, y: head.y }
-    : { x: head.x + 1 >= boardWidth ? 0 : head.x + 1, y: head.y };
+      ? { x: head.x, y: head.y + 1 >= boardHeight ? 0 : head.y + 1 }
+      : direction === "ArrowLeft"
+        ? { x: head.x - 1 < 0 ? boardWidth - 1 : head.x - 1, y: head.y }
+        : { x: head.x + 1 >= boardWidth ? 0 : head.x + 1, y: head.y };
 
 export const initSnake = (boardWidth: number, boardHeight: number) => {
   const y = Math.ceil((boardHeight - 1) / 2);
@@ -103,7 +103,7 @@ export const initSnake = (boardWidth: number, boardHeight: number) => {
 
 export const generateInitialBoardHeight = (
   gamepad: string,
-  testWidth = 0
+  testWidth = 0,
 ): number =>
   (window.innerHeight < 768 && gamepad === "responsive") || gamepad === "on"
     ? Math.ceil((testWidth > 0 ? testWidth : window.innerHeight) / 70)
