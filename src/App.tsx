@@ -10,6 +10,7 @@ import { Len9Marquee } from "./components/Len9";
 import { Len9Text } from "./components/Len9";
 import { UpdateSettingButton } from "./components/Buttons";
 import { useSnakeMachine } from "./hooks/useSnakeMachine";
+import { getQueryParam } from "./utilities";
 
 const App = () => {
   const {
@@ -53,9 +54,17 @@ const App = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [send]);
 
+  // Handle query params
   useEffect(() => {
+    const themeQueryParam = getQueryParam("theme");
+    // Query param overrides theme setting temporarily (no localStorage update)
+    const effectiveTheme =
+      themeQueryParam === "light" || themeQueryParam === "dark"
+        ? themeQueryParam
+        : theme;
+
     const htmlElement = document.documentElement;
-    if (theme === "dark") {
+    if (effectiveTheme === "dark") {
       htmlElement.classList.add("dark-theme");
     } else {
       htmlElement.classList.remove("dark-theme");

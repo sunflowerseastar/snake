@@ -111,3 +111,9 @@ export const generateInitialBoardHeight = (
 
 export const generateInitialBoardWidth = (testWidth = 0): number =>
   Math.ceil((testWidth > 0 ? testWidth : window.innerWidth) / 50);
+
+// Query param utilities
+export const getQueryParam = (param: string): string | null => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+};
