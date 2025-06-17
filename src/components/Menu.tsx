@@ -112,6 +112,9 @@ export const Menu = () => {
               {activeSettingKey === "gamepad" && (
                 <BgBoard boardWidth={boardWidth} boardHeight={boardHeight} />
               )}
+              {activeSettingKey === "theme" && (
+                <BgBoard boardWidth={boardWidth} boardHeight={boardHeight} />
+              )}
               {activeSettingKey === "overlap" && <OverlapDemonstrationBoard />}
               {activeSettingKey === "speed" && <SpeedDemonstrationBoard />}
               {activeSettingKey === "wall" && <WallDemonstrationBoard />}
